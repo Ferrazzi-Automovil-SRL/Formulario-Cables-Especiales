@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ferrazzi - Formulario de Cables Especiales</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    }
+    h1 { font-size: 26px; margin-bottom: 10px; }
+    p.desc { color: #555; margin-bottom: 20px; }
+    section { margin-bottom: 25px; }
+    label { font-weight: bold; display: block; margin-bottom: 8px; }
+    input[type="text"], select, textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    .options { 
+      margin-top: 8px; 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .options label {
+      font-weight: normal;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      width: 140px; /* ancho fijo para que queden prolijas las cards */
+      text-align: center;
+    }
+    .options label:hover {
+      border-color: #FE5000;
+      box-shadow: 0 0 5px rgba(254,80,0,0.5);
+    }
+    .options input[type="radio"] {
+      margin-bottom: 8px;
+    }
+    .options img {
+      max-width: 100px;
+      max-height: 80px;
+      margin-bottom: 6px;
+      object-fit: contain;
+    }
+    .required { color: red; margin-left: 4px; }
+    button {
+      background: #FE5000;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #d84500; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Ferrazzi - Formulario de Cables Especiales</h1>
+    <p class="desc">
+      La fabricación de cables especiales se hace en Línea Competición de 9mm, color naranja. 
+      La demora del mismo es de 7 días hábiles.
+    </p>
+
+    <form>
+      <!-- Ejemplo con imágenes en opciones radio -->
+      <section>
+        <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
+        <div class="options">
+          <label>
+            <input type="radio" name="cap_bujia" value="Recto" required>
+            <img src="recto.jpg" alt="Capuchón recto">
+            Recto
+          </label>
+          <label>
+            <input type="radio" name="cap_bujia" value="90">
+            <img src="90.jpg" alt="Capuchón 90 grados">
+            A 90°
+          </label>
+          <label>
+            <input type="radio" name="cap_bujia" value="corsa">
+            <img src="corsa.jpg" alt="Capuchón recto tipo Corsa">
+            Recto, tipo Corsa
+          </label>
+          <label>
+            <input type="radio" name="cap_bujia" value="angulo">
+            <img src="angulo.jpg" alt="Capuchón en ángulo">
+            En ángulo
+          </label>
+          <label>
+            <input type="radio" name="cap_bujia" value="otro">
+            <img src="otro.jpg" alt="Otro capuchón">
+            Otro
+          </label>
+        </div>
+        <input type="text" name="cap_bujia_otro" placeholder="Especificar">
+      </section>
+
+      <!-- Botón -->
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+</body>
+</html>

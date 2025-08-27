@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta property="og:type" content="Formulario Cables Especiales">
+  <meta name="copyright" content="Emanuel Morano Solé">
+  <link rel="icon" href="/images/favicon/favicon 32x32.ico" sizes="32x32" type="image/x-icon">
+  <link rel="icon" href="/images/favicon/favicon 16x16.ico" sizes="16x16" type="image/x-icon">
+  <title>Ferrazzi - Formulario de Cables Especiales</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    }
+    h1 { font-size: 26px; margin-bottom: 10px; }
+    p.desc { color: #555; margin-bottom: 20px; }
+    section { margin-bottom: 25px; }
+    label { font-weight: bold; display: block; margin-bottom: 8px; }
+    input[type="text"], select, textarea, input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-top: 5px;
+    }
+    .options { margin-top: 8px; }
+    .options label {
+      font-weight: normal;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .required { color: red; margin-left: 4px; }
+    button {
+      background: #FE5000;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover { background: #d84500; }
+
+    /*Banner stylos*/
+    .banner {
+    width: 100%;
+    margin-bottom: 20px; /* separa del contenido siguiente */
+    }
+
+    .banner-img {
+    width: 100%;       /* ocupa todo el ancho del contenedor */
+    height: auto;      /* mantiene la proporción de la imagen */
+    display: block;    /* quita espacios blancos debajo de la imagen */
+    border-radius: 8px; /* opcional */
+    }
+
+    /*para emprolijar donde van imagenes*/
+    .card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    }
+
+    .largo{
+        width: 100%;       /* ocupa todo el ancho del contenedor */
+        height: auto;      /* mantiene la proporción de la imagen */
+    }
+
+    .cards {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    cursor: pointer;
+    width: 300px;
+    text-align: center;
+    box-sizing: border-box; /* importante para que padding no haga que la card se desborde */
+    }
+
+    .cards input[type="radio"] {
+    margin-bottom: 8px; /* separa el radio de la imagen */
+    }
+
+    .cards img {
+    max-width: 100%;  /* evita que la imagen sobresalga */
+    height: auto;
+    max-height: 300px;
+    margin-bottom: 6px;
+    }
+
+  </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Banner superior con imagen -->
+        <div class="banner">
+        <img src="./images/1x/bannerFerrazzi.jpg" alt="Ferrazzi" class="banner-img">
+        </div>
+    </div>
+    <div class="container">
+
+        <h1>Ferrazzi - Formulario de Cables Especiales</h1>
+        <p class="desc">
+        La fabricación de cables especiales se hace en Línea Competición de 9mm, color naranja. 
+        La demora del mismo es de 7 días hábiles.
+        </p>
+
+        <form>
+        <!-- Cantidad cilindros -->
+        <section>
+            <label for="cilindros">Indicar la cantidad de cilindros que tiene el vehículo <span class="required">*</span></label>
+            <select id="cilindros" name="cilindros" required>
+            <option value="">Elegir...</option>
+            <option>4</option>
+            <option>6</option>
+            <option>8</option>
+            </select>
+        </section>
+
+        <!-- Distribuidor o bobinas -->
+        <section>
+            <label>El vehículo es con distribuidor o bobinas individuales? <span class="required">*</span></label>
+            <div class="options">
+            <label><input type="radio" name="sistema" value="bobinas" required> Bobinas individuales</label>
+            <label><input type="radio" name="sistema" value="distribuidor"> Distribuidor</label>
+            </div>
+        </section>
+
+        <!-- Medidas cables -->
+        <section>
+            <label for="medidas">Colocar la medida de cada cable (capuchón a capuchón) <span class="required">*</span>
+                <div class="card-container">
+                    <img class="largo" src="./images/largoCables.png" alt="Largo de los cables">
+                </div>
+            </label>
+            <input type="text" id="medidas" name="medidas" required placeholder="Ejemplo: Cable1=30cm, Cable2=40cm...">
+        </section>
+
+        <!-- Terminales lado bujías -->
+        <section>
+            <label>Tipo de terminales, lado Bujías <span class="required">*</span></label>
+            <div class="options card-container">
+                <label class="cards">
+                    <img src="./images/1x/SAE.jpg" alt="SAE">
+                    <span>SAE</span>
+                    <input type="radio" name="terminal_bujia" value="SAE">
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/PIN.jpg" alt="PIN">
+                    <span>PIN</span>
+                    <input type="radio" name="terminal_bujia" value="PIN">
+                </label>
+            </div>
+        </section>
+
+        <!-- Capuchones lado bujías -->
+        <section>
+            <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
+            <div class="options card-container">
+                <label class="cards">
+                    <img src="./images/1x/RECTO_BUJIA.jpg" alt="RECTO"> 
+                    <span>Recto</span>
+                    <input type="radio" name="cap_bujia" value="Recto">
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/A90_BUJIA.jpg" alt="A 90">
+                    <span>A 90°</span>
+                    <input type="radio" name="cap_bujia" value="90">
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="RECTO, TIPO CORSA">
+                    <span>Recto, tipo Corsa</span>
+                    <input type="radio" name="cap_bujia" value="corsa"> 
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/ANGULO_BUJIA.jpg" alt="EN ANGULO">
+                    <span>En ángulo</span>
+                    <input type="radio" name="cap_bujia" value="angulo">
+                </label>
+            </div>
+            <!-- Otro -->
+                <label> 
+                    <span>Otro:</span>
+                    <input type="radio" name="cap_bujia" value="otro"> 
+                </label>
+            <input type="text" name="cap_bujia_otro" placeholder="Especificar">
+        </section>
+
+        <!-- Adjuntar foto capuchones lado bujías -->
+        <section>
+            <label>Fotos de capuchones (si elegiste "Otro")</label>
+            <input type="file" name="foto_cap_bujia" multiple accept="image/*">
+        </section>
+
+        <!-- Terminales bobina -->
+        <section>
+            <label>Tipo de terminales, lado Bobinas <span class="required">*</span></label>
+            <div class="options card-container">
+                <label class="cards">
+                    <img src="./images/1x/BOBINA_GOL.jpg" alt="BOBINA DE GOL">
+                    <span>Bobina de GOL (PIN)</span>
+                    <input type="radio" name="terminal_bobina" value="gol">
+                </label>
+                <label class="cards">
+                    <img src="./imageS/1x/BOBINA_PALIO.jpg" alt="BOBINA TIPO PALIO (DIN)">
+                    <span>Bobina tipo Palio (DIN)</span>    
+                    <input type="radio" name="terminal_bobina" value="palio">
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/BOBINA_ONIX.jpg" alt="BOBINA SECA TIPO ONIX">
+                    <span>Bobina seca tipo Onix (PIN)</span>
+                    <input type="radio" name="terminal_bobina" value="onix">
+                </label>
+            </div>
+        </section>
+
+        <!-- Capuchones lado bobinas -->
+        <section>
+            <label>Tipo de Capuchones, lado Bobinas <span class="required">*</span></label>
+            <div class="options card-container">
+                <label class="cards">
+                    <img src="./images/1x/RECTO_BOBINA.jpg" alt="RECTO ">
+                    <span>Recto</span>
+                    <input type="radio" name="cap_bobina" value="Recto">
+                </label>
+                <label class="cards">
+                    <img src="./images/1x/A90_BOBINA.jpg" alt="A 90">
+                    <span>A 90°</span>
+                    <input type="radio" name="cap_bobina" value="90"> 
+                </label>
+            
+            </div>
+            <!-- Otro -->
+            <label>
+                <span>Otro:</span>
+                <input type="radio" name="cap_bobina" value="otro">
+            </label>
+            <input type="text" name="cap_bobina_otro" placeholder="Especificar">
+        </section>
+
+        <!-- Adjuntar foto capuchones lado bobinas -->
+        <section>
+            <label>Fotos de capuchones (si elegiste "Otro")</label>
+            <input type="file" name="foto_cap_bobina" multiple accept="image/*">
+        </section>
+
+        <!-- Nota final -->
+        <section>
+            <label for="nota">Cualquier duda podés dejarnos una nota acá mismo ⚡</label>
+            <input type="text" id="nota" name="nota" placeholder="Escribí tu comentario...">
+        </section>
+
+        <button type="submit">Enviar</button>
+        </form>
+    </div>
+</body>
+</html>
