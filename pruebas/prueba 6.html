@@ -1,0 +1,104 @@
+<body>
+
+<div class="container">
+    <h1>Ferrazzi - Formulario de Cables Especiales</h1>
+    <p class="desc">
+        La fabricación de cables especiales se hace en Línea Competición de 9mm, color naranja. 
+        La demora del mismo es de 7 días hábiles.
+    </p>
+
+    <form id="formCables">
+        <!-- Cantidad cilindros -->
+        <section>
+            <label for="cilindros">Indicar la cantidad de cilindros que tiene el vehículo <span class="required">*</span></label>
+            <select id="cilindros" name="cilindros" required>
+                <option value="">Elegir...</option>
+                <option>4</option>
+                <option>6</option>
+                <option>8</option>
+            </select>
+        </section>
+
+        <!-- Distribuidor o bobinas -->
+        <section>
+            <label>El vehículo es con distribuidor o bobinas individuales? <span class="required">*</span></label>
+            <div class="options">
+                <label><input type="radio" name="sistema" value="bobinas" required> Bobinas individuales</label>
+                <label><input type="radio" name="sistema" value="distribuidor"> Distribuidor</label>
+            </div>
+        </section>
+
+        <!-- Medidas cables -->
+        <section>
+            <label for="medidas">Colocar la medida de cada cable (capuchón a capuchón) <span class="required">*</span></label>
+            <input type="text" id="medidas" name="medidas" required placeholder="Ejemplo: Cable1=30cm, Cable2=40cm...">
+        </section>
+
+        <!-- Nota final -->
+        <section>
+            <label for="nota">Cualquier duda podés dejarnos una nota acá mismo ⚡</label>
+            <input type="text" id="nota" name="nota" placeholder="Escribí tu comentario...">
+        </section>
+
+        <button type="submit">Enviar</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+<script>
+    document.getElementById("formCables").addEventListener("submit", async function(e){
+        e.preventDefault(); // evitar recargar la página
+
+        const form = e.target;
+
+        // Datos del cliente
+        const datosCliente = {
+            cilindros: form.cilindros.value,
+            sistema: form.sistema.value,
+            medidas: form.medidas.value,
+            nota: form.nota.value
+        };
+
+        // Datos técnicos (inventados, los podes modificar luego)
+        const datosTecnicos = {
+            cilindros: datosCliente.cilindros,
+            sistema: datosCliente.sistema,
+            medidas: datosCliente.medidas.split(",").map(m => m.trim()).join(" | "), // ejemplo procesado
+            codigo: "TEC-12345"
+        };
+
+        // Crear workbook
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet('Pedido');
+
+        // Encabezados
+        sheet.addRow(["Cilindros","Sistema","Medidas","Nota/Código"]);
+
+        // Fila cliente
+        const filaCliente = sheet.addRow([datosCliente.cilindros, datosCliente.sistema, datosCliente.medidas, datosCliente.nota]);
+        filaCliente.eachCell(cell => {
+            cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+        });
+
+        // Fila técnica
+        const filaTecnica = sheet.addRow([datosTecnicos.cilindros, datosTecnicos.sistema, datosTecnicos.medidas, datosTecnicos.codigo]);
+        filaTecnica.eachCell(cell => {
+            cell.fill = { type: 'pattern', pattern:'solid', fgColor:{argb:'FFFFA500'} }; // naranja
+            cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+        });
+
+        // Ajustar ancho columnas
+        sheet.columns.forEach(column => { column.width = 25; });
+
+        // Descargar Excel
+        const buf = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buf], { type: "application/octet-stream" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "pedido_completo.xlsx";
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+</script>
+</body>

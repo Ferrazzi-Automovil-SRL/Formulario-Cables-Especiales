@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Cables Especiales</title>
+</head>
+<body>
+    <h1>Pedido de Cable Especial</h1>
+    <form id="formCables">
+        <label>Tipo de cable:
+            <select name="tipoCable">
+                <option value="A">Cable A</option>
+                <option value="B">Cable B</option>
+                <option value="C">Cable C</option>
+            </select>
+        </label>
+        <br><br>
+
+        <label>Capuchón:
+            <select name="capuchon">
+                <option value="capuchón rojo">Capuchón rojo</option>
+                <option value="capuchón negro">Capuchón negro</option>
+            </select>
+        </label>
+        <br><br>
+
+        <label>Terminal:
+            <select name="terminal">
+                <option value="terminal tipo A">Terminal tipo A</option>
+                <option value="terminal tipo B">Terminal tipo B</option>
+            </select>
+        </label>
+        <br><br>
+
+        <button type="button" id="btnEnviar">Enviar</button>
+    </form>
+
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script>
+        // Diccionarios simples
+        const traducciones = {
+            cables: {
+                "A": "CAB-A",
+                "B": "CAB-B",
+                "C": "CAB-C"
+            },
+            capuchones: {
+                "capuchón rojo": "CAP-R",
+                "capuchón negro": "CAP-N"
+            },
+            terminales: {
+                "terminal tipo A": "TERM-A",
+                "terminal tipo B": "TERM-B"
+            }
+        };
+
+        // Reglas especiales de combinación
+        const reglasCombinaciones = {
+            "B|capuchón rojo|terminal tipo A": "COD-B-ROJO-A",
+            "A|capuchón negro|terminal tipo B": "COD-A-NEGRO-B"
+        };
+
+        document.getElementById("btnEnviar").addEventListener("click", function () {
+            const form = document.getElementById("formCables");
+
+            // Datos que elige el cliente
+            const datosCliente = {
+                tipoCable: form.elements["tipoCable"].value,
+                capuchon: form.elements["capuchon"].value,
+                terminal: form.elements["terminal"].value
+            };
+
+            // Buscar regla especial
+            const clave = `${datosCliente.tipoCable}|${datosCliente.capuchon}|${datosCliente.terminal}`;
+            const codigoEspecial = reglasCombinaciones[clave] || null;
+
+            // Traducir con diccionarios
+            const datosTecnicos = {
+                tipoCable: traducciones.cables[datosCliente.tipoCable] || datosCliente.tipoCable,
+                capuchon: traducciones.capuchones[datosCliente.capuchon] || datosCliente.capuchon,
+                terminal: traducciones.terminales[datosCliente.terminal] || datosCliente.terminal,
+                codigoFinal: codigoEspecial || "SIN-REGLA"
+            };
+
+            // Exportar Excel cliente
+            exportarExcel([datosCliente], "pedido_cliente.xlsx");
+
+            // Exportar Excel técnico
+            exportarExcel([datosTecnicos], "pedido_tecnico.xlsx");
+        });
+
+        // Función genérica para exportar Excel
+        function exportarExcel(datos, nombreArchivo) {
+            const hoja = XLSX.utils.json_to_sheet(datos);
+            const libro = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(libro, hoja, "Datos");
+            XLSX.writeFile(libro, nombreArchivo);
+        }
+    </script>
+</body>
+</html>

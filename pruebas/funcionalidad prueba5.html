@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario Cables Especiales</title>
+</head>
+<body>
+    <h1>Pedido de Cable Especial</h1>
+    <form id="formCables">
+        <label>Tipo de cable:
+            <select name="tipoCable">
+                <option value="A">Cable A</option>
+                <option value="B">Cable B</option>
+                <option value="C">Cable C</option>
+            </select>
+        </label>
+        <br><br>
+
+        <label>Capuchón:
+            <select name="capuchon">
+                <option value="capuchón rojo">Capuchón rojo</option>
+                <option value="capuchón negro">Capuchón negro</option>
+            </select>
+        </label>
+        <br><br>
+
+        <label>Terminal:
+            <select name="terminal">
+                <option value="terminal tipo A">Terminal tipo A</option>
+                <option value="terminal tipo B">Terminal tipo B</option>
+            </select>
+        </label>
+        <br><br>
+
+        <button type="button" id="btnEnviar">Generar Excel</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script>
+        // Diccionarios simples
+        const traducciones = {
+            cables: { "A": "CAB-A", "B": "CAB-B", "C": "CAB-C" },
+            capuchones: { "capuchón rojo": "CAP-R", "capuchón negro": "CAP-N" },
+            terminales: { "terminal tipo A": "TERM-A", "terminal tipo B": "TERM-B" }
+        };
+
+        // Reglas especiales de combinación
+        const reglasCombinaciones = {
+            "B|capuchón rojo|terminal tipo A": "COD-B-ROJO-A",
+            "A|capuchón negro|terminal tipo B": "COD-A-NEGRO-B"
+        };
+
+        const btnEnviar = document.getElementById("btnEnviar");
+        const form = document.getElementById("formCables");
+
+        btnEnviar.addEventListener("click", async function() {
+            // Datos cliente
+            const datosCliente = {
+                tipoCable: form.elements["tipoCable"].value,
+                capuchon: form.elements["capuchon"].value,
+                terminal: form.elements["terminal"].value
+            };
+
+            // Datos técnicos
+            const clave = `${datosCliente.tipoCable}|${datosCliente.capuchon}|${datosCliente.terminal}`;
+            const codigoEspecial = reglasCombinaciones[clave] || "SIN-REGLA";
+
+            const datosTecnicos = {
+                tipoCable: traducciones.cables[datosCliente.tipoCable] || datosCliente.tipoCable,
+                capuchon: traducciones.capuchones[datosCliente.capuchon] || datosCliente.capuchon,
+                terminal: traducciones.terminales[datosCliente.terminal] || datosCliente.terminal,
+                codigoFinal: codigoEspecial
+            };
+
+            // Crear workbook
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet('Pedido');
+
+            // Encabezados
+            sheet.addRow(["Tipo Cable","Capuchon","Terminal","CodigoFinal"]);
+
+            // Fila cliente
+            const filaCliente = sheet.addRow([datosCliente.tipoCable, datosCliente.capuchon, datosCliente.terminal, ""]);
+            filaCliente.eachCell(cell => {
+                cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+            });
+
+            // Fila técnica
+            const filaTecnica = sheet.addRow([datosTecnicos.tipoCable, datosTecnicos.capuchon, datosTecnicos.terminal, datosTecnicos.codigoFinal]);
+            filaTecnica.eachCell(cell => {
+                cell.fill = { type: 'pattern', pattern:'solid', fgColor:{argb:'FFFFA500'} }; // naranja
+                cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
+            });
+
+            // Ajustar ancho de columnas
+            sheet.columns.forEach(column => { column.width = 20; });
+
+            // Descargar Excel
+            const buf = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buf], { type: "application/octet-stream" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "pedido_completo.xlsx";
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body>
+</html>
