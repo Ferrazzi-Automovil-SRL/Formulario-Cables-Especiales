@@ -37,6 +37,11 @@
     margin-top: 5px;
     box-sizing: border-box; /* Esto asegura que el padding y el borde se incluyan en el 100% del ancho */
     }
+    @media (max-width: 800px) {
+    .card-container img {
+        width: 90%;
+    }
+}
     </style>
 </head>
 <body>
@@ -58,7 +63,7 @@
             <!-- Aclaracion como tomar medidas de los cables -->
              <label for="medidas">Cuando coloque la medida de los cables, por favor tener en cuenta que los cables se miden de capuchón a capuchón contemplando el largo total.
                 <div class="card-container">
-                    <img class="largo" src="./images/largoCables.png" alt="Largo de los cables">
+                    <img src="./images/largoCables.png" alt="Largo de los cables">
                 </div>
             </label>
             <!-- Cantidad cilindros -->
