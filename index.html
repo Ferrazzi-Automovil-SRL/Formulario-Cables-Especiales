@@ -55,7 +55,12 @@
         </p>
 
         <form id="formCables">
-            <!-- Aquí va TODO tu formulario tal cual lo pasaste -->
+            <!-- Aclaracion como tomar medidas de los cables -->
+             <label for="medidas">Cuando coloque la medida de los cables, por favor tener en cuenta que los cables se miden de capuchón a capuchón contemplando el largo total.
+                <div class="card-container">
+                    <img class="largo" src="./images/largoCables.png" alt="Largo de los cables">
+                </div>
+            </label>
             <!-- Cantidad cilindros -->
             <section>
                 <label for="cilindros">Indicar la cantidad de cilindros <span class="required">*</span></label>
@@ -181,12 +186,12 @@
                     <!-- NUEVAS BOBINAS -->
                     <label class="cards">
                         <img src="./images/1x/imagenes-14.jpg" alt="BOBINA BOTELLA">
-                        <span>Bobina botella BA354/355</span>
+                        <span>Bobina botella BA354/355 (DIN)</span>
                         <input type="radio" name="terminal_bobina" value="BA355">
                     </label>
                     <label class="cards">
                         <img src="./images/1x/imagenes-13.jpg" alt="BOBINA SECA BA360">
-                        <span>Bobina seca BA360</span>
+                        <span>Bobina seca BA360 (SAE)</span>
                         <input type="radio" name="terminal_bobina" value="BA360">
                     </label>
                 </div>
@@ -270,6 +275,55 @@
             "BA360": "Bobina seca BA360"
         };
 
+        //codigos capuchones y pines DICCIONARIO
+        const codigosCapuchonBujia = {
+            "Recto": "[INSCAP1022] Capuchon Competicion 22",
+            "90": "[INSCAP1074] Capuchon Competicion 74",
+            "corsa": "[INSCAP2216] Capuchon Competicion 216 armado",
+            "angulo": "[INSCAP1039] Capuchon Competicion 39"
+        };
+
+        const codigosTerminalBujia = {
+            "SAE": "[INSTER0096] Terminal 96",
+            "PIN": "[INSTER0005] Terminal 5"
+        };
+    
+        const codigosCapuchonBobina = {
+            "Recto": "[INSCAP1027] Capuchon Competicion 27",
+            "90": "[INSCAP1019] Capuchon Competicion 19"
+        };
+
+        const codigosTerminalBobina = {
+        "gol": "[INSTER0022] Terminal 22",
+        "palio": "[INSTER0092] Terminal 92",
+        "onix": "[INSTER0022] Terminal 22",
+        "BA355": "[INSTER0092] Terminal 92",
+        "BA360": "[INSTER0005] Terminal 5"
+        };
+
+        // DICCIONARIO PARA EL CABLE DEL DISTRIBUIDOR
+        const codigosLado1Tipo = {
+            "DIN": "Falta definir terminal para DIN lado 1",
+            "PIN": "Falta definir terminal para PIN lado 1",
+            "SAE": "Falta definir terminal para SAE lado 1"
+        };
+        const codigosLado1Angulo = {
+            "Recto": "Falta definir capuchon recto para lado 1 distribuidor",
+            "90°": "Falta definir capuchon 90° para lado 1 distribuidor"
+        };
+        const codigosLado2Tipo = {
+            "DIS": "Falta definir terminal para DIS lado 2",
+            "DIN": "Falta definir terminal para DIN lado 2",
+            "PIN": "Falta definir terminal para PIN lado 2",
+            "SAE": "Falta definir terminal para SAE lado 2"
+        };
+        const codigosLado2Angulo = {
+            "Recto": "Falta definir capuchon recto para lado 2 distribuidor",
+            "90°": "Falta definir capuchon 90° para lado 2 distribuidor"
+        };
+
+        //-------------------------------------------------------------
+
         document.getElementById("formCables").addEventListener("submit", async function(e){
             e.preventDefault();
             const form = e.target;
@@ -302,15 +356,17 @@
             };
 
             // Datos técnicos
+   
             const datosTecnicos = {
-                cilindros: datosCliente.cilindros,
-                sistema: datosCliente.sistema,
-                medidas: datosCliente.medidas, // Simplificado, la lógica anterior era redundante
-                terminal_bujia: datosCliente.terminal_bujia + "-TEC",
-                cap_bujia: datosCliente.cap_bujia + "-TEC",
-                terminal_bobina: datosCliente.terminal_bobina + "-TEC",
-                cap_bobina: datosCliente.cap_bobina + "-TEC",
-                //codigo: "TEC-12345" // Esta propiedad sigue comentada
+            cilindros: datosCliente.cilindros,
+            sistema: datosCliente.sistema,
+            medidas: datosCliente.medidas,
+            
+            // Si encuentra el código en el mapa, lo usa. Si no (ej: "otro"), pone el texto original.
+            terminal_bujia: codigosTerminalBujia[datosCliente.terminal_bujia] || datosCliente.terminal_bujia,
+            cap_bujia: codigosCapuchonBujia[datosCliente.cap_bujia] || datosCliente.cap_bujia,
+            terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
+            cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
             };
 
             // Crear Excel
@@ -332,7 +388,7 @@
 
             // Añadir encabezados de distribuidor si fue seleccionado
             if (datosCliente.sistema === 'distribuidor') {
-                headers.push("Lado 1 Tipo", "Lado 1 Ángulo", "Lado 2 Tipo", "Lado 2 Ángulo", "Largo Cable Distribuidor");
+                headers.push("Lado 1 Tipo (Distribuidor)", "Lado 1 Ángulo (Distribuidor)", "Lado 2 Tipo (Distribuidor)", "Lado 2 Ángulo (Distribuidor)", "Largo Cable Distribuidor");
             }
 
             headers.push(
@@ -340,7 +396,7 @@
                 "Capuchón Bujía",
                 "Terminal Bobina",
                 "Capuchón Bobina",
-                "Nota/Código"
+                "Nota"
             );
             sheet.addRow(headers);
 
@@ -363,23 +419,58 @@
             );
             const filaCliente = sheet.addRow(filaClienteData);
             filaCliente.eachCell(cell => cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' });
-            
+
             // Fila técnica
+
+            // 1. CREAMOS EL NUEVO ARRAY CON LOS CÁLCULOS
+            const largosTecnicos = largosArray.map(largoCm => {
+                // Convertimos el valor a número para poder hacer cálculos
+                const valorNumerico = parseFloat(largoCm);
+
+                // Verificamos si es un número válido. Si no, dejamos la celda vacía.
+                if (isNaN(valorNumerico)) {
+                    return ""; // O puedes poner "Error" o 0 si prefieres
+                }
+
+                // Aplicamos la fórmula: (valor / 100) + 0.035
+                const resultado = (valorNumerico / 100) + 0.035;
+
+                // Devolvemos el resultado con 3 decimales para evitar números largos
+                return parseFloat(resultado.toFixed(3)); 
+            });
+
+            // 2. USAMOS EL NUEVO ARRAY CALCULADO EN LA FILA TÉCNICA
             const filaTecnicaData = [
                 datosTecnicos.cilindros,
                 datosTecnicos.sistema,
-                ...largosArray.map(l => l + "-TEC")
+                ...largosTecnicos // <-- Aquí usamos el array con los valores ya calculados
             ];
+
             if (datosCliente.sistema === 'distribuidor') {
-                filaTecnicaData.push(datosCliente.lado1_tipo + "-TEC", datosCliente.lado1_angulo + "-TEC", datosCliente.lado2_tipo + "-TEC", datosCliente.lado2_angulo + "-TEC", datosCliente.largo_cable + "-TEC");
+            const largoCableDistCm = parseFloat(datosCliente.largo_cable);
+            let largoCableDistTecnico = "";
+            if (!isNaN(largoCableDistCm)) {
+                largoCableDistTecnico = parseFloat(((largoCableDistCm / 100) + 0.035).toFixed(3));
             }
+
+            // Usamos los nuevos diccionarios para buscar los códigos
+            filaTecnicaData.push(
+                codigosLado1Tipo[datosCliente.lado1_tipo] || datosCliente.lado1_tipo,
+                codigosLado1Angulo[datosCliente.lado1_angulo] || datosCliente.lado1_angulo,
+                codigosLado2Tipo[datosCliente.lado2_tipo] || datosCliente.lado2_tipo,
+                codigosLado2Angulo[datosCliente.lado2_angulo] || datosCliente.lado2_angulo,
+                largoCableDistTecnico
+            );
+            }
+
             filaTecnicaData.push(
                 datosTecnicos.terminal_bujia,
                 datosTecnicos.cap_bujia,
                 datosTecnicos.terminal_bobina,
                 datosTecnicos.cap_bobina,
-                datosTecnicos.codigo || "" // ✅ CORRECCIÓN 2: Añadir fallback por si 'codigo' no existe.
+                datosTecnicos.codigo || "" 
             );
+
             const filaTecnica = sheet.addRow(filaTecnicaData);
             filaTecnica.eachCell(cell=>{
                 cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFA500'}};
