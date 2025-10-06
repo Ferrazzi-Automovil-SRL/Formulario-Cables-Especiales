@@ -510,7 +510,20 @@
                 cap_bobina: datosComboBobina.capuchon || "Capuchón Bobina no definido",
             };
 
-            //NO ANDA EL BOTON EXPORTAR EXCEL 
+            // --- Generar el texto para la columna "Articulo" ---
+            const articulos = largosArray.map(largo => {
+                if (!largo) return ""; // Si no hay largo, no crear artículo
+                
+                // Construimos la cadena con el formato: "Largo, Terminales/Capuchones"
+                const terminales = `${datosTecnicos.terminal_bujia}-${datosTecnicos.terminal_bobina}`;
+                const capuchones = `${datosTecnicos.cap_bujia}-${datosTecnicos.cap_bobina}`;
+                
+                return `${largo} cm, ${terminales}/${capuchones}`;
+            });
+            
+            // Unimos todos los artículos en un solo texto, separados por un salto de línea
+            const textoArticulosParaCelda = articulos.join('\n');
+
 
             //const datosTecnicos = {
             //cilindros: datosCliente.cilindros,
@@ -535,11 +548,7 @@
             }
 
             // Fila de Encabezados
-            const headers = [
-                "Cilindros",
-                "Sistema",
-                ...encabezadosCilindros
-            ];
+            const headers = [ "Cilindros", "Sistema", ...encabezadosCilindros ];
 
             // Añadir encabezados de distribuidor si fue seleccionado
             if (datosCliente.sistema === 'distribuidor') {
@@ -557,11 +566,8 @@
 
 
             // Fila cliente
-            const filaClienteData = [
-                datosCliente.cilindros,
-                datosCliente.sistema,
-                ...largosArray
-            ];
+            const filaClienteData = [ datosCliente.cilindros, datosCliente.sistema, ...largosArray ];
+
             if (datosCliente.sistema === 'distribuidor') {
                 filaClienteData.push(datosCliente.lado1_tipo, datosCliente.lado1_angulo, datosCliente.lado2_tipo, datosCliente.lado2_angulo, datosCliente.largo_cable);
             }
@@ -594,11 +600,7 @@
             });
 
             // 2. USAMOS EL NUEVO ARRAY CALCULADO EN LA FILA TÉCNICA
-            const filaTecnicaData = [
-                datosTecnicos.cilindros,
-                datosTecnicos.sistema,
-                ...largosTecnicos // <-- Aquí usamos el array con los valores ya calculados
-            ];
+            const filaTecnicaData = [ datosTecnicos.cilindros, datosTecnicos.sistema, ...largosTecnicos ];
 
             if (datosCliente.sistema === 'distribuidor') {
             const largoCableDistCm = parseFloat(datosCliente.largo_cable);
@@ -630,7 +632,27 @@
                 cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFA500'}};
                 cell.alignment={wrapText:true,vertical:'middle',horizontal:'center'};
             });
+            
+                // --- INICIO: CÓDIGO PARA CREAR LA TABLA DE ARTÍCULOS EN D12 ---
+                const filaInicioArticulos = 12; // Fila donde comenzará la nueva tabla
+                const columnaArticulos = 'D';   // Columna donde estará
 
+                // Escribir el encabezado "Articulo" en la celda D12
+                const headerCell = sheet.getCell(`${columnaArticulos}${filaInicioArticulos}`);
+                headerCell.value = 'Articulo';
+                headerCell.font = { bold: true };
+                headerCell.border = { bottom: { style: 'thin' } };
+                headerCell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' }; // <-- LÍNEA AGREGADA
+
+                // Recorrer la lista de artículos que ya generamos antes
+                articulos.forEach((articulo, index) => {
+                    // Calculamos la fila actual (13, 14, 15, ...)
+                    const filaActual = filaInicioArticulos + 1 + index;
+                    const celdaArticulo = sheet.getCell(`${columnaArticulos}${filaActual}`);
+                    celdaArticulo.value = articulo;
+                    celdaArticulo.alignment = { wrapText: true, vertical: 'middle' }; // <-- LÍNEA AGREGADA
+                });
+                // --- FIN: CÓDIGO PARA CREAR LA TABLA DE ARTÍCULOS ---
 
             // Ajustar ancho
             sheet.columns.forEach(col => col.width = 25);
