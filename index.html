@@ -37,12 +37,12 @@
     margin-top: 5px;
     box-sizing: border-box; /* Esto asegura que el padding y el borde se incluyan en el 100% del ancho */
     }
+    .submenu-container {margin-top: 20px;}
+    .submenu-capuchon {margin-bottom: 15px;}
     @media (max-width: 800px) {
-    .card-container img {
-        width: 100%;
-    }
+    .card-container img {width: 100%;}
     .container {margin-right: 30px;margin-left: 30px;}
-}
+    }
     </style>
 </head>
 <body>
@@ -141,7 +141,85 @@
                     </label>-->
                 </div>
             </section>
+
             <!-- Capuchones lado bujías -->
+            <section>
+                <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
+                
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_BUJIA.jpg" alt="RECTO">
+                        <span>Recto</span>
+                        <input type="radio" name="cap_bujia_categoria" value="recto" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/A90_BUJIA.jpg" alt="A 90">
+                        <span>A 90°</span>
+                        <input type="radio" name="cap_bujia_categoria" value="90" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="RECTO, TIPO CORSA">
+                        <span>Recto, tipo Corsa</span>
+                        <input type="radio" name="cap_bujia_categoria" value="corsa" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/ANGULO_BUJIA.jpg" alt="EN ANGULO">
+                        <span>En ángulo</span>
+                        <input type="radio" name="cap_bujia_categoria" value="angulo" required>
+                    </label>
+                </div>
+
+                <div id="submenus-capuchones" class="submenu-container">
+                    
+                    <div id="submenu-recto" class="submenu-capuchon hidden">
+                        <label for="modelo_recto">Seleccionar modelo Recto:</label>
+                        <select name="modelo_recto" required>
+                            <option value="">Elegir...</option>
+                            <option value="Recto Modelo A">Recto Modelo A</option>
+                            <option value="Recto Modelo B">Recto Modelo B</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-90" class="submenu-capuchon hidden">
+                        <label for="modelo_90">Seleccionar modelo A 90°:</label>
+                        <select name="modelo_90" required>
+                            <option value="">Elegir...</option>
+                            <option value="90 Grados Modelo X">90 Grados Modelo X</option>
+                            <option value="90 Grados Modelo Y">90 Grados Modelo Y</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-corsa" class="submenu-capuchon hidden">
+                        <label for="modelo_corsa">Seleccionar modelo Tipo Corsa:</label>
+                        <select name="modelo_corsa" required>
+                            <option value="">Elegir...</option>
+                            <option value="Corsa Classic">Corsa Classic</option>
+                            <option value="Corsa II">Corsa II</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-angulo" class="submenu-capuchon hidden">
+                        <label for="modelo_angulo">Seleccionar modelo En Ángulo:</label>
+                        <select name="modelo_angulo" required>
+                            <option value="">Elegir...</option>
+                            <option value="Angulo 45 Grados">Angulo 45 Grados</option>
+                            <option value="Angulo Especial Z">Angulo Especial Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <label>
+                        <span>Otro:</span>
+                        <input type="radio" name="cap_bujia_categoria" value="otro" required>
+                    </label>
+                    <div id="submenu-otro" class="hidden">
+                    <input type="text" name="cap_bujia_otro" placeholder="Especificar" required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 
             <section>
                 <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
                 <div class="options card-container">
@@ -168,7 +246,8 @@
                 </div>
                 <label><span>Otro:</span><input type="radio" name="cap_bujia" value="otro"></label>
                 <input type="text" name="cap_bujia_otro" placeholder="Especificar">
-            </section>
+            </section> 
+            -->
 
             <!-- Terminales bobina -->
             <section>
@@ -189,7 +268,7 @@
                         <span>Bobina seca tipo Onix (PIN)</span>
                         <input type="radio" name="terminal_bobina" value="onix">
                     </label>
-                    <!-- NUEVAS BOBINAS -->
+                    
                     <label class="cards">
                         <img src="./images/1x/imagenes-14.jpg" alt="BOBINA BOTELLA">
                         <span>Bobina botella BA354/355 (DIN)</span>
@@ -202,7 +281,6 @@
                     </label>
                 </div>
             </section>
-
 
             <!-- Capuchones lado bobinas -->
             <section>
@@ -344,6 +422,20 @@
                 largosArray.push(val);
             }
 
+            // --- Función para obtener el valor final del capuchón de bujía ---
+            const getCapuchonBujiaValue = () => {
+            const categoria = form.querySelector('input[name="cap_bujia_categoria"]:checked');
+            if (!categoria) return ""; // Si no hay nada seleccionado, devuelve vacío
+
+            const categoriaValue = categoria.value;
+            if (categoriaValue === 'otro') {
+                return form.cap_bujia_otro.value;
+            } else {
+                const selectDelModelo = form.querySelector(`select[name="modelo_${categoriaValue}"]`);
+                return selectDelModelo ? selectDelModelo.value : "";
+            }
+            };
+
             // Datos cliente
             const datosCliente = {
                 cilindros: form.cilindros.value,
@@ -354,7 +446,8 @@
                 lado2_angulo: form.lado2_angulo ? form.lado2_angulo.value : "",
                 largo_cable: form.largo_cable ? form.largo_cable.value : "",
                 terminal_bujia: form.terminal_bujia.value,
-                cap_bujia: form.cap_bujia.value === "otro" ? form.cap_bujia_otro.value : form.cap_bujia.value,
+                cap_bujia: getCapuchonBujiaValue(),
+                //cap_bujia: form.cap_bujia.value === "otro" ? form.cap_bujia_otro.value : form.cap_bujia.value,
                 terminal_bobina: traducciones[form.terminal_bobina.value] || form.terminal_bobina.value,
                 cap_bobina: form.cap_bobina.value === "otro" ? form.cap_bobina_otro.value : form.cap_bobina.value,
                 nota: form.nota.value,
@@ -496,6 +589,44 @@
             a.download = "pedido_completo.xlsx";
             a.click();
             URL.revokeObjectURL(url);
+        });
+
+        // --- LÓGICA PARA LOS SUBMENÚS DE CAPUCHONES DE BUJÍA ---
+        const categoriaRadios = document.querySelectorAll('input[name="cap_bujia_categoria"]');
+        const todosLosSubmenus = document.querySelectorAll('.submenu-capuchon, #submenu-otro');
+
+        // Habilitar/deshabilitar campos según la selección
+        const toggleRequired = (submenu, required) => {
+            const field = submenu.querySelector('select, input');
+            if (field) {
+                field.required = required;
+            }
+        };
+
+        categoriaRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                // 1. Ocultar todos los submenús y quitar 'required'
+                todosLosSubmenus.forEach(submenu => {
+                    submenu.classList.add('hidden');
+                    toggleRequired(submenu, false);
+                });
+
+                // 2. Mostrar el submenú correspondiente y agregar 'required'
+                const categoriaSeleccionada = event.target.value;
+                if (categoriaSeleccionada !== 'otro') {
+                    const submenuAMostrar = document.getElementById(`submenu-${categoriaSeleccionada}`);
+                    if (submenuAMostrar) {
+                        submenuAMostrar.classList.remove('hidden');
+                        toggleRequired(submenuAMostrar, true);
+                    }
+                } else {
+                    const submenuOtro = document.getElementById('submenu-otro');
+                    if(submenuOtro) {
+                        submenuOtro.classList.remove('hidden');
+                        toggleRequired(submenuOtro, true);
+                    }
+                }
+            });
         });
     </script>
 
