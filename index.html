@@ -244,6 +244,7 @@
             -->
 
             <!-- Terminales bobina -->
+             <!--  
             <section>
                 <label>Tipo de terminales, lado Bobinas <span class="required">*</span></label>
                 <div class="options card-container">
@@ -275,8 +276,10 @@
                     </label>
                 </div>
             </section>
+            -->
 
             <!-- Capuchones lado bobinas -->
+             <!--  
             <section>
                 <label>Tipo de Capuchones, lado Bobinas <span class="required">*</span></label>
                 <div class="options card-container">
@@ -293,6 +296,20 @@
                 </div>
                 <label><span>Otro:</span><input type="radio" name="cap_bobina" value="otro"></label>
                 <input type="text" name="cap_bobina_otro" placeholder="Especificar">
+            </section>
+            -->
+
+            <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas -->
+            <section>
+                <label for="combo_bobina">Configuración Lado Bobina <span class="required">*</span></label>
+                <select id="combo_bobina" name="combo_bobina" required>
+                    <option value="">Elegir combinación...</option>
+                    <option value="gol_recto_pin">Bobina GOL / Capuchón Recto / Conexión PIN</option>
+                    <option value="palio_90_din">Bobina PALIO / Capuchón 90° / Conexión DIN</option>
+                    <option value="onix_recto_pin">Bobina ONIX / Capuchón Recto / Conexión PIN</option>
+                    <option value="ba355_90_din">Bobina Botella BA355 / Capuchón 90° / Conexión DIN</option>
+                    <option value="ba360_recto_sae">Bobina Seca BA360 / Capuchón Recto / Conexión SAE</option>
+                    </select>
             </section>
 
             <!-- Nota final -->
@@ -384,6 +401,15 @@
         "BA360": "[INSTER0005] Terminal 5"
         };
 
+        const datosBobinaCombinados = {
+        "gol_recto_pin":    { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0022] Terminal 22" },
+        "palio_90_din":     { capuchon: "[INSCAP1019] Capuchon Competicion 19", terminal: "[INSTER0092] Terminal 92" },
+        "onix_recto_pin":   { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0022] Terminal 22" },
+        "ba355_90_din":     { capuchon: "[INSCAP1019] Capuchon Competicion 19", terminal: "[INSTER0092] Terminal 92" },
+        "ba360_recto_sae":  { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0005] Terminal 5" }
+        // Asegúrate de que las claves aquí coincidan con los 'value' del <select> en el HTML
+        };
+
         // DICCIONARIO PARA EL CABLE DEL DISTRIBUIDOR
         const codigosLado1Tipo = {
             "DIN": "Falta definir terminal para DIN lado 1",
@@ -445,10 +471,11 @@
                 lado2_angulo: form.lado2_angulo ? form.lado2_angulo.value : "",
                 largo_cable: form.largo_cable ? form.largo_cable.value : "",
                 //terminal_bujia: form.terminal_bujia.value,
-                cap_bujia: getCapuchonBujiaValue(),
+                cap_bujia: getCapuchonBujiaValue(),//reemplaza terminal_bujia
                 //cap_bujia: form.cap_bujia.value === "otro" ? form.cap_bujia_otro.value : form.cap_bujia.value,
-                terminal_bobina: traducciones[form.terminal_bobina.value] || form.terminal_bobina.value,
-                cap_bobina: form.cap_bobina.value === "otro" ? form.cap_bobina_otro.value : form.cap_bobina.value,
+                //terminal_bobina: traducciones[form.terminal_bobina.value] || form.terminal_bobina.value,
+                //cap_bobina: form.cap_bobina.value === "otro" ? form.cap_bobina_otro.value : form.cap_bobina.value,
+                combo_bobina: form.combo_bobina.options[form.combo_bobina.selectedIndex].text,//reemplaza cap y terminal_bobina
                 nota: form.nota.value,
                 medidas: largosArray.join(" | ")
             };
@@ -460,6 +487,11 @@
 
             // 2. Usamos el modelo para buscar en el diccionario el objeto que tiene AMBOS códigos
             const datosCombinados = codigosCapuchonBujia[modeloCapuchonSeleccionado] || {};
+            
+               // Obtenemos la combinación seleccionada, ej: "gol_recto_pin"
+            const comboBobinaSeleccionado = form.combo_bobina.value;
+            // Buscamos en el diccionario el objeto con los dos códigos
+            const datosComboBobina = datosBobinaCombinados[comboBobinaSeleccionado] || {};
 
             const datosTecnicos = {
                 cilindros: datosCliente.cilindros,
@@ -470,9 +502,12 @@
                 terminal_bujia: datosCombinados.terminal || "Terminal no definido", // Código del terminal
                 cap_bujia: datosCombinados.capuchon || modeloCapuchonSeleccionado, // Código del capuchón
                 
-                // El resto de los códigos sigue igual
-                terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
-                cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+                //terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
+                //cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+
+                // Asignamos los códigos correspondientes
+                terminal_bobina: datosComboBobina.terminal || "Terminal Bobina no definido",
+                cap_bobina: datosComboBobina.capuchon || "Capuchón Bobina no definido",
             };
 
             //NO ANDA EL BOTON EXPORTAR EXCEL 
@@ -531,10 +566,9 @@
                 filaClienteData.push(datosCliente.lado1_tipo, datosCliente.lado1_angulo, datosCliente.lado2_tipo, datosCliente.lado2_angulo, datosCliente.largo_cable);
             }
             filaClienteData.push(
-                datosTecnicos.terminal_bujia,
+                datosTecnicos.terminal_bujia, 
                 datosCliente.cap_bujia,
-                datosCliente.terminal_bobina,
-                datosCliente.cap_bobina,
+                datosCliente.combo_bobina, // <-- CAMBIO PRINCIPAL AQUÍ
                 datosCliente.nota
             );
             const filaCliente = sheet.addRow(filaClienteData);
