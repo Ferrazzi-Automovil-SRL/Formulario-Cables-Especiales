@@ -29,14 +29,7 @@
     /*ocultar submenu*/
     .hidden {display: none;}
     /*correccion input type text*/
-    input[type="text"], select, textarea, input[type="file"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-top: 5px;
-    box-sizing: border-box; /* Esto asegura que el padding y el borde se incluyan en el 100% del ancho */
-    }
+    input[type="text"], select, textarea, input[type="file"] {width: 100%;padding: 10px;border: 1px solid #ccc;border-radius: 6px;margin-top: 5px;box-sizing: border-box; /* Esto asegura que el padding y el borde se incluyan en el 100% del ancho */}
     .submenu-container {margin-top: 20px;}
     .submenu-capuchon {margin-bottom: 15px;}
     @media (max-width: 800px) {
@@ -94,20 +87,20 @@
             <section id="submenuDistribuidor" class="hidden">
                 <h3>Opciones Distribuidor</h3>
 
-                <label for="lado1_tipo">Tipo conexión Lado 1:</label>
+                <label for="lado1_tipo">Tipo conexión Lado Bujía:</label>
                 <select id="lado1_tipo" name="lado1_tipo">
                     <option value="DIN">DIN</option>
                     <option value="PIN">PIN</option>
                     <option value="SAE">SAE</option>
                 </select>
 
-                <label for="lado1_angulo">Ángulo Lado 1:</label>
+                <label for="lado1_angulo">Ángulo Lado Bujía:</label>
                 <select id="lado1_angulo" name="lado1_angulo">
                     <option value="Recto">Recto</option>
                     <option value="90°">90°</option>
                 </select>
 
-                <label for="lado2_tipo">Tipo conexión Lado 2:</label>
+                <label for="lado2_tipo">Tipo conexión Lado Bobina:</label>
                 <select id="lado2_tipo" name="lado2_tipo">
                     <option value="DIS">DIS</option>
                     <option value="DIN">DIN</option>
@@ -115,7 +108,7 @@
                     <option value="SAE">SAE</option>
                 </select>
 
-                <label for="lado2_angulo">Ángulo Lado 2:</label>
+                <label for="lado2_angulo">Ángulo Lado Bobina:</label>
                 <select id="lado2_angulo" name="lado2_angulo">
                     <option value="Recto">Recto</option>
                     <option value="90°">90°</option>
@@ -126,7 +119,8 @@
             </section>
             <!-- FIN DEL NUEVO SUBMENÚ -->
             <!-- Terminales lado bujías -->
-            <section>
+            <!-- Queda obsoleto, los capuchones terminan definiendo el tipo de terminal
+                <section>
                 <label>Tipo de terminales, lado Bujías <span class="required">*</span></label>
                 <div class="options card-container">
                     <label class="cards">
@@ -134,13 +128,13 @@
                         <span>SAE</span>
                         <input type="radio" name="terminal_bujia" value="SAE">
                     </label>
-                    <!--<label class="cards">
+                    <label class="cards">
                         <img src="./images/1x/PIN.jpg" alt="PIN">
                         <span>PIN</span>
                         <input type="radio" name="terminal_bujia" value="PIN">
-                    </label>-->
+                    </label>
                 </div>
-            </section>
+            </section>-->
 
             <!-- Capuchones lado bujías -->
             <section>
@@ -175,8 +169,8 @@
                         <label for="modelo_recto">Seleccionar modelo Recto:</label>
                         <select name="modelo_recto" required>
                             <option value="">Elegir...</option>
-                            <option value="Recto Modelo A">Recto Modelo A</option>
-                            <option value="Recto Modelo B">Recto Modelo B</option>
+                            <option value="CF22">CF22</option>
+                            <option value="CF05">CF05</option>
                         </select>
                     </div>
 
@@ -361,9 +355,14 @@
 
         //codigos capuchones y pines DICCIONARIO
         const codigosCapuchonBujia = {
-            "Recto": "[INSCAP1022] Capuchon Competicion 22",
+            // Modelos de la categoría "Recto"
+            "CF22": { capuchon: "[INSCAP1022] Capuchon Competicion 22", terminal: "[INSTER0096] Terminal 96" },
+            "CF05": { capuchon: "[INSCAP1005] Capuchon Competicion 5", terminal: "[INSTER0006] Terminal 6" },
+            // Modelos de la categoría "A 90°"
             "90": "[INSCAP1074] Capuchon Competicion 74",
+            // Modelos de la categoría "Tipo Corsa"
             "corsa": "[INSCAP2216] Capuchon Competicion 216 armado",
+            // Modelos de la categoría "Angulo"
             "angulo": "[INSCAP1039] Capuchon Competicion 39"
         };
 
@@ -445,7 +444,7 @@
                 lado2_tipo: form.lado2_tipo ? form.lado2_tipo.value : "",
                 lado2_angulo: form.lado2_angulo ? form.lado2_angulo.value : "",
                 largo_cable: form.largo_cable ? form.largo_cable.value : "",
-                terminal_bujia: form.terminal_bujia.value,
+                //terminal_bujia: form.terminal_bujia.value,
                 cap_bujia: getCapuchonBujiaValue(),
                 //cap_bujia: form.cap_bujia.value === "otro" ? form.cap_bujia_otro.value : form.cap_bujia.value,
                 terminal_bobina: traducciones[form.terminal_bobina.value] || form.terminal_bobina.value,
@@ -455,18 +454,40 @@
             };
 
             // Datos técnicos
-   
+
+            // 1. Obtenemos el modelo de capuchón que el usuario seleccionó (ej: "Recto Modelo A")
+            const modeloCapuchonSeleccionado = getCapuchonBujiaValue();
+
+            // 2. Usamos el modelo para buscar en el diccionario el objeto que tiene AMBOS códigos
+            const datosCombinados = codigosCapuchonBujia[modeloCapuchonSeleccionado] || {};
+
             const datosTecnicos = {
-            cilindros: datosCliente.cilindros,
-            sistema: datosCliente.sistema,
-            medidas: datosCliente.medidas,
+                cilindros: datosCliente.cilindros,
+                sistema: datosCliente.sistema,
+                medidas: datosCliente.medidas,
+                
+                // 3. Asignamos los códigos desde el objeto que encontramos
+                terminal_bujia: datosCombinados.terminal || "Terminal no definido", // Código del terminal
+                cap_bujia: datosCombinados.capuchon || modeloCapuchonSeleccionado, // Código del capuchón
+                
+                // El resto de los códigos sigue igual
+                terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
+                cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+            };
+
+            //NO ANDA EL BOTON EXPORTAR EXCEL 
+
+            //const datosTecnicos = {
+            //cilindros: datosCliente.cilindros,
+            //sistema: datosCliente.sistema,
+            //medidas: datosCliente.medidas,
             
             // Si encuentra el código en el mapa, lo usa. Si no (ej: "otro"), pone el texto original.
-            terminal_bujia: codigosTerminalBujia[datosCliente.terminal_bujia] || datosCliente.terminal_bujia,
-            cap_bujia: codigosCapuchonBujia[datosCliente.cap_bujia] || datosCliente.cap_bujia,
-            terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
-            cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
-            };
+            //terminal_bujia: codigosTerminalBujia[datosCliente.terminal_bujia] || datosCliente.terminal_bujia,
+            //cap_bujia: codigosCapuchonBujia[datosCliente.cap_bujia] || datosCliente.cap_bujia,
+            //terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
+            //cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+            //};
 
             // Crear Excel
             const workbook = new ExcelJS.Workbook();
@@ -510,7 +531,7 @@
                 filaClienteData.push(datosCliente.lado1_tipo, datosCliente.lado1_angulo, datosCliente.lado2_tipo, datosCliente.lado2_angulo, datosCliente.largo_cable);
             }
             filaClienteData.push(
-                datosCliente.terminal_bujia,
+                datosTecnicos.terminal_bujia,
                 datosCliente.cap_bujia,
                 datosCliente.terminal_bobina,
                 datosCliente.cap_bobina,
