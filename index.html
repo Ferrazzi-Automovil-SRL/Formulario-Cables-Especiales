@@ -54,27 +54,6 @@
         </p>
 
         <form id="formCables">
-            <!-- Aclaracion como tomar medidas de los cables -->
-             <label for="medidas">Cuando coloque la medida de los cables, por favor tener en cuenta que los cables se miden de capuchón a capuchón contemplando el largo total.
-                <div class="card-container">
-                    <img src="./images/largoCables.png" alt="Largo de los cables">
-                </div>
-            </label>
-            <!-- Cantidad cilindros -->
-            <section>
-                <label for="cilindros">Indicar la cantidad de cilindros <span class="required">*</span></label>
-                <select id="cilindros" name="cilindros" required>
-                    <option value="">Elegir...</option>
-                    <option>4</option>
-                    <option>6</option>
-                    <option>8</option>
-                </select>
-            </section>
-            <section id="largosCilindros" class="hidden">
-                <label>Largo de cables por cilindro (cm):</label>
-                <div id="inputsLargos"></div>
-            </section>
-            
             <!-- Distribuidor o bobinas -->
             <section>
                 <label>El vehículo es con distribuidor o bobinas individuales? <span class="required">*</span></label>
@@ -117,7 +96,28 @@
                 <label for="largo_cable">Largo del Cable (cm):</label>
                 <input type="text" id="largo_cable" name="largo_cable" placeholder="Ej: 30">
             </section>
-            <!-- FIN DEL NUEVO SUBMENÚ -->
+
+            <!-- Aclaracion como tomar medidas de los cables -->
+             <label for="medidas">Cuando coloque la medida de los cables, por favor tener en cuenta que los cables se miden de capuchón a capuchón contemplando el largo total.
+                <div class="card-container">
+                    <img src="./images/largoCables.png" alt="Largo de los cables">
+                </div>
+            </label>
+            <!-- Cantidad cilindros -->
+            <section>
+                <label for="cilindros">Indicar la cantidad de cilindros <span class="required">*</span></label>
+                <select id="cilindros" name="cilindros" required>
+                    <option value="">Elegir...</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                </select>
+            </section>
+            <section id="largosCilindros" class="hidden">
+                <label>Largo de cables por cilindro (cm):</label>
+                <div id="inputsLargos"></div>
+            </section>
+            
             <!-- Terminales lado bujías -->
             <!-- Queda obsoleto, los capuchones terminan definiendo el tipo de terminal
                 <section>
