@@ -81,10 +81,10 @@
 
                 <label for="lado2_tipo">Tipo conexión Lado Bobina:</label>
                 <select id="lado2_tipo" name="lado2_tipo">
-                    <option value="DIS">DIS</option>
+                    <option value="DIS">SAE</option>
                     <option value="DIN">DIN</option>
                     <option value="PIN">PIN</option>
-                    <option value="SAE">SAE</option>
+                    <!-- <option value="DIS">SAE</option> -->
                 </select>
 
                 <label for="lado2_angulo">Ángulo Lado Bobina:</label>
@@ -302,6 +302,7 @@
             -->
 
             <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas -->
+             <!--
             <section>
                 <label for="combo_bobina">Configuración Lado Bobina <span class="required">*</span></label>
                 <select id="combo_bobina" name="combo_bobina" required>
@@ -312,6 +313,32 @@
                     <option value="ba355_90_din">Bobina Botella BA355 / Capuchón 90° / Conexión DIN</option>
                     <option value="ba360_recto_sae">Bobina Seca BA360 / Capuchón Recto / Conexión SAE</option>
                     </select>
+            </section>
+            -->
+            <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas y del distribuidor segun lo que elija el user mas arriba -->
+            <section id="config-bobina-section" class="hidden">
+                <label for="combo_bobina">Configuración Lado Bobina <span class="required">*</span></label>
+                <select id="combo_bobina" name="combo_bobina">
+                    <option value="">Elegir combinación...</option>
+                    <option value="gol_recto_pin">Pin Gol 14mm</option>
+                    <option value="palio_90_din">Pin CORSA 18mm</option>
+                    <option value="onix_recto_pin">Pin ONIX</option>
+                    <option value="ba355_90_din">Pin Zetec</option>
+                    <option value="ba360_recto_sae">Din 8mm (Falcon/128)</option>
+                    <option value="ba360_recto_sae">Din 7mm (Motorcraft)</option>
+                    <option value="ba360_recto_sae">SAE</option>
+                </select>
+            </section>
+
+            <section id="config-distribuidor-section" class="hidden">
+                <label for="combo_distribuidor">Configuración Lado Distribuidor <span class="required">*</span></label>
+                <select id="combo_distribuidor" name="combo_distribuidor">
+                    <option value="">Elegir combinación...</option>
+                    <option value="dist_90_pin">DIN 7mm Motorcraft</option>     
+                    <option value="dist_recto_din">DIN 8mm</option>
+                    <option value="dist_90_pin">PIN</option>
+                    <option value="dist_90_pin">SAE</option>
+                </select>
             </section>
 
             <!-- Nota final -->
@@ -326,20 +353,36 @@
 
     <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
     <script>
-        // Mostrar/ocultar submenú según selección
+        // Mostrar/ocultar menús de configuración según el sistema (Bobina o Distribuidor)
         const sistemaRadios = document.querySelectorAll('input[name="sistema"]');
-        const submenuDistribuidor = document.getElementById("submenuDistribuidor");
+        const submenuDistribuidor = document.getElementById("submenuDistribuidor"); // <-- La sección que había desaparecido
+        const seccionConfigBobina = document.getElementById('config-bobina-section');
+        const seccionConfigDistribuidor = document.getElementById('config-distribuidor-section');
+        const selectBobina = document.getElementById('combo_bobina');
+        const selectDistribuidor = document.getElementById('combo_distribuidor');
 
         sistemaRadios.forEach(radio => {
             radio.addEventListener("change", () => {
-                if (radio.value === "distribuidor" && radio.checked) {
-                    submenuDistribuidor.classList.remove("hidden");
-                } else {
-                    submenuDistribuidor.classList.add("hidden");
+                if (radio.value === "bobinas" && radio.checked) {
+                    // Si se elige BOBINAS:
+                    seccionConfigBobina.classList.remove("hidden");      // Muestra config. de bobina
+                    selectBobina.required = true;
+
+                    submenuDistribuidor.classList.add("hidden");        // Oculta las opciones detalladas de distribuidor
+                    seccionConfigDistribuidor.classList.add("hidden");  // Oculta la config. de distribuidor
+                    selectDistribuidor.required = false;
+
+                } else if (radio.value === "distribuidor" && radio.checked) {
+                    // Si se elige DISTRIBUIDOR:
+                    submenuDistribuidor.classList.remove("hidden");       // Muestra las opciones detalladas
+                    seccionConfigDistribuidor.classList.remove("hidden"); // Muestra la config. de distribuidor
+                    selectDistribuidor.required = true;
+
+                    seccionConfigBobina.classList.add("hidden");          // Oculta la config. de bobina
+                    selectBobina.required = false;
                 }
             });
         });
-
         //Cilindros
         const cilindrosSelect = document.getElementById("cilindros");
         const largosCilindros = document.getElementById("largosCilindros");
@@ -412,6 +455,12 @@
         // Asegúrate de que las claves aquí coincidan con los 'value' del <select> en el HTML
         };
 
+        const datosDistribuidorCombinados = {
+        "dist_recto_din": { capuchon: "CODIGO-CAP-DIST-RECTO", terminal: "CODIGO-TERM-DIST-DIN" },
+        "dist_90_pin":  { capuchon: "CODIGO-CAP-DIST-90", terminal: "CODIGO-TERM-DIST-PIN" }
+        // Rellena con tus datos reales. Las claves deben coincidir con los 'value' del HTML
+        };
+
         // DICCIONARIO PARA EL CABLE DEL DISTRIBUIDOR
         const codigosLado1Tipo = {
             "DIN": "Falta definir terminal para DIN lado 1",
@@ -463,54 +512,56 @@
             }
             };
 
+            // --- INICIO: CAPTURA DE DATOS UNIFICADA ---
+
             // Datos cliente
             const datosCliente = {
-                cilindros: form.cilindros.value,
-                sistema: form.sistema.value,
-                lado1_tipo: form.lado1_tipo ? form.lado1_tipo.value : "",
-                lado1_angulo: form.lado1_angulo ? form.lado1_angulo.value : "",
-                lado2_tipo: form.lado2_tipo ? form.lado2_tipo.value : "",
-                lado2_angulo: form.lado2_angulo ? form.lado2_angulo.value : "",
-                largo_cable: form.largo_cable ? form.largo_cable.value : "",
-                //terminal_bujia: form.terminal_bujia.value,
-                cap_bujia: getCapuchonBujiaValue(),//reemplaza terminal_bujia
-                //cap_bujia: form.cap_bujia.value === "otro" ? form.cap_bujia_otro.value : form.cap_bujia.value,
-                //terminal_bobina: traducciones[form.terminal_bobina.value] || form.terminal_bobina.value,
-                //cap_bobina: form.cap_bobina.value === "otro" ? form.cap_bobina_otro.value : form.cap_bobina.value,
-                combo_bobina: form.combo_bobina.options[form.combo_bobina.selectedIndex].text,//reemplaza cap y terminal_bobina
-                nota: form.nota.value,
-                medidas: largosArray.join(" | ")
+            cilindros: form.cilindros.value,
+            sistema: form.sistema.value,
+            cap_bujia: getCapuchonBujiaValue(),
+            nota: form.nota.value,
+            medidas: largosArray.join(" | ")
             };
 
-            // Datos técnicos
+        // Datos técnicos y lógicos
+        const modeloCapuchonSeleccionado = getCapuchonBujiaValue();
+        const datosCombinadosBujia = codigosCapuchonBujia[modeloCapuchonSeleccionado] || {};
+        
+        let capuchonLadoMotor = "";
+        let terminalLadoMotor = "";
+        let descripcionLadoMotor = "";
 
-            // 1. Obtenemos el modelo de capuchón que el usuario seleccionó (ej: "Recto Modelo A")
-            const modeloCapuchonSeleccionado = getCapuchonBujiaValue();
-
-            // 2. Usamos el modelo para buscar en el diccionario el objeto que tiene AMBOS códigos
-            const datosCombinados = codigosCapuchonBujia[modeloCapuchonSeleccionado] || {};
-            
-               // Obtenemos la combinación seleccionada, ej: "gol_recto_pin"
+        // Verificamos qué sistema se eligió para saber de dónde sacar los datos
+        if (datosCliente.sistema === 'bobinas') {
             const comboBobinaSeleccionado = form.combo_bobina.value;
-            // Buscamos en el diccionario el objeto con los dos códigos
             const datosComboBobina = datosBobinaCombinados[comboBobinaSeleccionado] || {};
+            capuchonLadoMotor = datosComboBobina.capuchon || "Capuchón Bobina no definido";
+            terminalLadoMotor = datosComboBobina.terminal || "Terminal Bobina no definido";
+            descripcionLadoMotor = form.combo_bobina.options[form.combo_bobina.selectedIndex].text;
 
-            const datosTecnicos = {
-                cilindros: datosCliente.cilindros,
-                sistema: datosCliente.sistema,
-                medidas: datosCliente.medidas,
-                
-                // 3. Asignamos los códigos desde el objeto que encontramos
-                terminal_bujia: datosCombinados.terminal || "Terminal no definido", // Código del terminal
-                cap_bujia: datosCombinados.capuchon || modeloCapuchonSeleccionado, // Código del capuchón
-                
-                //terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
-                //cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+        } else if (datosCliente.sistema === 'distribuidor') {
+            const comboDistribuidorSeleccionado = form.combo_distribuidor.value;
+            const datosComboDistribuidor = datosDistribuidorCombinados[comboDistribuidorSeleccionado] || {};
+            capuchonLadoMotor = datosComboDistribuidor.capuchon || "Capuchón Distribuidor no definido";
+            terminalLadoMotor = datosComboDistribuidor.terminal || "Terminal Distribuidor no definido";
+            descripcionLadoMotor = form.combo_distribuidor.options[form.combo_distribuidor.selectedIndex].text;
+        }
 
-                // Asignamos los códigos correspondientes
-                terminal_bobina: datosComboBobina.terminal || "Terminal Bobina no definido",
-                cap_bobina: datosComboBobina.capuchon || "Capuchón Bobina no definido",
-            };
+        // Agregamos la descripción al objeto datosCliente para usarla en la Fila Cliente
+        datosCliente.configuracion_lado_motor = descripcionLadoMotor;
+
+        const datosTecnicos = {
+            cilindros: datosCliente.cilindros,
+            sistema: datosCliente.sistema,
+            medidas: datosCliente.medidas,
+            terminal_bujia: datosCombinadosBujia.terminal || "Terminal no definido",
+            cap_bujia: datosCombinadosBujia.capuchon || modeloCapuchonSeleccionado,
+            
+            // Asignamos los códigos correspondientes al sistema elegido
+            terminal_bobina: terminalLadoMotor,
+            cap_bobina: capuchonLadoMotor,
+        };
+        // --- FIN: CAPTURA DE DATOS UNIFICADA ---
 
             // --- Generar el texto para la columna "Articulo" ---
             const articulos = largosArray.map(largo => {
@@ -573,12 +624,14 @@
             if (datosCliente.sistema === 'distribuidor') {
                 filaClienteData.push(datosCliente.lado1_tipo, datosCliente.lado1_angulo, datosCliente.lado2_tipo, datosCliente.lado2_angulo, datosCliente.largo_cable);
             }
+
             filaClienteData.push(
-                datosTecnicos.terminal_bujia, 
-                datosCliente.cap_bujia,
-                datosCliente.combo_bobina, // <-- CAMBIO PRINCIPAL AQUÍ
-                datosCliente.nota
+            datosTecnicos.terminal_bujia, 
+            datosCliente.cap_bujia,
+            datosCliente.configuracion_lado_motor, // <-- Nueva variable unificada
+            datosCliente.nota
             );
+
             const filaCliente = sheet.addRow(filaClienteData);
             filaCliente.eachCell(cell => cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' });
 
