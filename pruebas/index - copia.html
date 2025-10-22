@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:type" content="Formulario Cables Especiales">
+    <meta name="copyright" content="Emanuel Morano Solé">
+    <link rel="icon" href="./images/favicon/favicon 32x32.ico" sizes="32x32" type="image/x-icon">
+    <link rel="icon" href="./images/favicon/favicon 16x16.ico" sizes="16x16" type="image/x-icon">
+    <title>Ferrazzi - Formulario Cables Especiales</title>
+    <style>
+    body { font-family: Arial, sans-serif; background:#f7f7f7; color:#333; margin:0; padding:0;}
+    .container { max-width:800px; margin:30px auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 2px 10px rgba(0,0,0,.1)}
+    h1{font-size:26px;margin-bottom:10px;}
+    p.desc{color:#555;margin-bottom:20px;}
+    section{margin-bottom:25px;}
+    label{font-weight:bold; display:block;margin-bottom:8px;margin-top: 14px;}
+    input[type="text"],select,textarea,input[type="file"]{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px;margin-top:5px;}
+    .options{margin-top:8px;}
+    .options label{font-weight:normal; display:block; margin-bottom:6px;}
+    .required{color:red;margin-left:4px;}
+    button{background:#FE5000;color:#fff;border:none;padding:12px 20px;border-radius:6px;cursor:pointer;font-size:16px;}
+    button:hover{background:#d84500;}
+    .card-container{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;margin-top:20px;}
+    .cards{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #ccc;border-radius:8px;padding:10px;cursor:pointer;width:300px;text-align:center;box-sizing:border-box;}
+    .cards input[type="radio"]{margin-bottom:8px;}
+    .cards img{max-width:100%;height:auto;max-height:300px;margin-bottom:6px;}
+    .banner-img{width:100%;height:auto;display:block;border-radius:8px;}
+    /*ocultar submenu*/
+    .hidden {display: none;}
+    /*correccion input type text*/
+    input[type="text"], select, textarea, input[type="file"] {width: 100%;padding: 10px;border: 1px solid #ccc;border-radius: 6px;margin-top: 5px;box-sizing: border-box; /* Esto asegura que el padding y el borde se incluyan en el 100% del ancho */}
+    .submenu-container {margin-top: 20px;}
+    .submenu-capuchon {margin-bottom: 15px;}
+    @media (max-width: 800px) {
+    .card-container img {width: 100%;}
+    .container {margin-right: 30px;margin-left: 30px;}
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Banner superior -->
+        <div class="banner">
+            <img src="./images/1x/bannerFerrazzi.jpg" alt="Ferrazzi" class="banner-img">
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Ferrazzi - Formulario de Cables Especiales</h1>
+        <p class="desc">
+            La fabricación de cables especiales se hace en Línea Competición de 9mm, color naranja. 
+            La demora del mismo es de 7 días hábiles.
+        </p>
+
+        <form id="formCables">
+            <!-- Distribuidor o bobinas -->
+            <section>
+                <label>El vehículo es con distribuidor o bobinas individuales? <span class="required">*</span></label>
+                <div class="options">
+                    <label><input type="radio" name="sistema" value="bobinas" required> Bobinas individuales</label>
+                    <label><input type="radio" name="sistema" value="distribuidor"> Distribuidor</label>
+                </div>
+            </section>
+            <!-- SUBMENÚ PARA DISTRIBUIDOR -->
+            <section id="submenuDistribuidor" class="hidden">
+                <h3>Opciones Distribuidor</h3>
+
+                <label for="lado1_tipo">Tipo conexión Lado Distribuidor:</label>
+                <select id="lado1_tipo" name="lado1_tipo">
+                    <option value="DIN">DIN</option>
+                    <option value="PIN">PIN</option>
+                    <option value="SAE">SAE</option>
+                </select>
+
+                <label for="lado1_angulo">Ángulo Lado Distribuidor:</label>
+                <select id="lado1_angulo" name="lado1_angulo">
+                    <option value="Recto">Recto</option>
+                    <option value="90°">90°</option>
+                </select>
+
+                <label for="lado2_tipo">Tipo conexión Lado Bobina:</label>
+                <select id="lado2_tipo" name="lado2_tipo">
+                    <option value="DIS">SAE</option>
+                    <option value="DIN">DIN</option>
+                    <option value="PIN">PIN</option>
+                    <!-- <option value="DIS">SAE</option> -->
+                </select>
+
+                <label for="lado2_angulo">Ángulo Lado Bobina:</label>
+                <select id="lado2_angulo" name="lado2_angulo">
+                    <option value="Recto">Recto</option>
+                    <option value="90°">90°</option>
+                </select>
+
+                <label for="largo_cable">Largo del Cable (cm):</label>
+                <input type="text" id="largo_cable" name="largo_cable" placeholder="Ej: 30">
+            </section>
+
+            <!-- Aclaracion como tomar medidas de los cables -->
+             <label for="medidas">Cuando coloque la medida de los cables, por favor tener en cuenta que los cables se miden de capuchón a capuchón contemplando el largo total.
+                <div class="card-container">
+                    <img src="./images/largoCables.png" alt="Largo de los cables">
+                </div>
+            </label>
+            <!-- Cantidad cilindros -->
+            <section>
+                <label for="cilindros">Indicar la cantidad de cilindros <span class="required">*</span></label>
+                <select id="cilindros" name="cilindros" required>
+                    <option value="">Elegir...</option>
+                    <option>4</option>
+                    <option>6</option>
+                    <option>8</option>
+                </select>
+            </section>
+            <section id="largosCilindros" class="hidden">
+                <label>Largo de cables por cilindro (cm):</label>
+                <div id="inputsLargos"></div>
+            </section>
+            
+            <!-- Terminales lado bujías -->
+            <!-- Queda obsoleto, los capuchones terminan definiendo el tipo de terminal
+                <section>
+                <label>Tipo de terminales, lado Bujías <span class="required">*</span></label>
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/SAE.jpg" alt="SAE">
+                        <span>SAE</span>
+                        <input type="radio" name="terminal_bujia" value="SAE">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/PIN.jpg" alt="PIN">
+                        <span>PIN</span>
+                        <input type="radio" name="terminal_bujia" value="PIN">
+                    </label>
+                </div>
+            </section>-->
+
+            <!-- Capuchones lado bujías -->
+            <section>
+                <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
+                
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_BUJIA.jpg" alt="RECTO">
+                        <span>Recto</span>
+                        <input type="radio" name="cap_bujia_categoria" value="recto" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/A90_BUJIA.jpg" alt="A 90">
+                        <span>A 90°</span>
+                        <input type="radio" name="cap_bujia_categoria" value="90" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="RECTO, TIPO CORSA">
+                        <span>Recto, tipo Corsa</span>
+                        <input type="radio" name="cap_bujia_categoria" value="corsa" required>
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/ANGULO_BUJIA.jpg" alt="EN ANGULO">
+                        <span>En ángulo</span>
+                        <input type="radio" name="cap_bujia_categoria" value="angulo" required>
+                    </label>
+                </div>
+
+                <div id="submenus-capuchones" class="submenu-container">
+                    
+                    <div id="submenu-recto" class="submenu-capuchon hidden">
+                        <label for="modelo_recto">Seleccionar modelo Recto:</label>
+                        <select name="modelo_recto" required>
+                            <option value="">Elegir...</option>
+                            <option value="CF22">CF22</option>
+                            <option value="CF05">CF05</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-90" class="submenu-capuchon hidden">
+                        <label for="modelo_90">Seleccionar modelo A 90°:</label>
+                        <select name="modelo_90" required>
+                            <option value="">Elegir...</option>
+                            <option value="90 Grados Modelo X">90 Grados Modelo X</option>
+                            <option value="90 Grados Modelo Y">90 Grados Modelo Y</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-corsa" class="submenu-capuchon hidden">
+                        <label for="modelo_corsa">Seleccionar modelo Tipo Corsa:</label>
+                        <select name="modelo_corsa" required>
+                            <option value="">Elegir...</option>
+                            <option value="Corsa Classic">Corsa Classic</option>
+                            <option value="Corsa II">Corsa II</option>
+                        </select>
+                    </div>
+
+                    <div id="submenu-angulo" class="submenu-capuchon hidden">
+                        <label for="modelo_angulo">Seleccionar modelo En Ángulo:</label>
+                        <select name="modelo_angulo" required>
+                            <option value="">Elegir...</option>
+                            <option value="Angulo 45 Grados">Angulo 45 Grados</option>
+                            <option value="Angulo Especial Z">Angulo Especial Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 
+                <div style="margin-top: 20px;">
+                    <label>
+                        <span>Otro:</span>
+                        <input type="radio" name="cap_bujia_categoria" value="otro" required>
+                    </label>
+                    <div id="submenu-otro" class="hidden">
+                    <input type="text" name="cap_bujia_otro" placeholder="Especificar capuchon y terminal" required>
+                    </div>
+                </div>
+                -->
+            </section>
+
+            <!-- 
+            <section>
+                <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_BUJIA.jpg" alt="RECTO">
+                        <span>Recto</span>
+                        <input type="radio" name="cap_bujia" value="Recto">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/A90_BUJIA.jpg" alt="A 90">
+                        <span>A 90°</span>
+                        <input type="radio" name="cap_bujia" value="90">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="RECTO, TIPO CORSA">
+                        <span>Recto, tipo Corsa</span>
+                        <input type="radio" name="cap_bujia" value="corsa">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/ANGULO_BUJIA.jpg" alt="EN ANGULO">
+                        <span>En ángulo</span>
+                        <input type="radio" name="cap_bujia" value="angulo">
+                    </label>
+                </div>
+                <label><span>Otro:</span><input type="radio" name="cap_bujia" value="otro"></label>
+                <input type="text" name="cap_bujia_otro" placeholder="Especificar">
+            </section> 
+            -->
+
+            <!-- Terminales bobina -->
+             <!--  
+            <section>
+                <label>Tipo de terminales, lado Bobinas <span class="required">*</span></label>
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/BOBINA_GOL.jpg" alt="BOBINA DE GOL">
+                        <span>Bobina de GOL (PIN)</span>
+                        <input type="radio" name="terminal_bobina" value="gol">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/BOBINA_PALIO.jpg" alt="BOBINA TIPO PALIO (DIN)">
+                        <span>Bobina tipo Palio (DIN)</span>    
+                        <input type="radio" name="terminal_bobina" value="palio">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/BOBINA_ONIX.jpg" alt="BOBINA SECA TIPO ONIX">
+                        <span>Bobina seca tipo Onix (PIN)</span>
+                        <input type="radio" name="terminal_bobina" value="onix">
+                    </label>
+                    
+                    <label class="cards">
+                        <img src="./images/1x/imagenes-14.jpg" alt="BOBINA BOTELLA">
+                        <span>Bobina botella BA354/355 (DIN)</span>
+                        <input type="radio" name="terminal_bobina" value="BA355">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/imagenes-13.jpg" alt="BOBINA SECA BA360">
+                        <span>Bobina seca BA360 (SAE)</span>
+                        <input type="radio" name="terminal_bobina" value="BA360">
+                    </label>
+                </div>
+            </section>
+            -->
+
+            <!-- Capuchones lado bobinas -->
+             <!--  
+            <section>
+                <label>Tipo de Capuchones, lado Bobinas <span class="required">*</span></label>
+                <div class="options card-container">
+                    <label class="cards">
+                        <img src="./images/1x/RECTO_BOBINA.jpg" alt="RECTO ">
+                        <span>Recto</span>
+                        <input type="radio" name="cap_bobina" value="Recto">
+                    </label>
+                    <label class="cards">
+                        <img src="./images/1x/A90_BOBINA.jpg" alt="A 90">
+                        <span>A 90°</span>
+                        <input type="radio" name="cap_bobina" value="90"> 
+                    </label>
+                </div>
+                <label><span>Otro:</span><input type="radio" name="cap_bobina" value="otro"></label>
+                <input type="text" name="cap_bobina_otro" placeholder="Especificar">
+            </section>
+            -->
+
+            <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas -->
+             <!--
+            <section>
+                <label for="combo_bobina">Configuración Lado Bobina <span class="required">*</span></label>
+                <select id="combo_bobina" name="combo_bobina" required>
+                    <option value="">Elegir combinación...</option>
+                    <option value="gol_recto_pin">Bobina GOL / Capuchón Recto / Conexión PIN</option>
+                    <option value="palio_90_din">Bobina PALIO / Capuchón 90° / Conexión DIN</option>
+                    <option value="onix_recto_pin">Bobina ONIX / Capuchón Recto / Conexión PIN</option>
+                    <option value="ba355_90_din">Bobina Botella BA355 / Capuchón 90° / Conexión DIN</option>
+                    <option value="ba360_recto_sae">Bobina Seca BA360 / Capuchón Recto / Conexión SAE</option>
+                    </select>
+            </section>
+            -->
+            <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas y del distribuidor segun lo que elija el user mas arriba -->
+            <section id="config-bobina-section" class="hidden">
+                <label for="combo_bobina">Configuración Lado Bobina <span class="required">*</span></label>
+                <select id="combo_bobina" name="combo_bobina">
+                    <option value="">Elegir combinación...</option>
+                    <option value="gol_recto_pin">Pin Gol 14mm</option>
+                    <option value="palio_90_din">Pin CORSA 18mm</option>
+                    <option value="onix_recto_pin">Pin ONIX</option>
+                    <option value="ba355_90_din">Pin Zetec</option>
+                    <option value="ba360_recto_sae">Din 8mm (Falcon/128)</option>
+                    <option value="ba360_recto_sae">Din 7mm (Motorcraft)</option>
+                    <option value="ba360_recto_sae">SAE</option>
+                </select>
+            </section>
+
+            <section id="config-distribuidor-section" class="hidden">
+                <label for="combo_distribuidor">Configuración Lado Distribuidor <span class="required">*</span></label>
+                <select id="combo_distribuidor" name="combo_distribuidor">
+                    <option value="">Elegir combinación...</option>
+                    <option value="dist_90_pin">DIN 7mm Motorcraft</option>     
+                    <option value="dist_recto_din">DIN 8mm</option>
+                    <option value="dist_90_pin">PIN</option>
+                    <option value="dist_90_pin">SAE</option>
+                </select>
+            </section>
+
+            <!-- Nota final -->
+            <section>
+                <label for="nota">Cualquier duda podés dejarnos una nota acá mismo ⚡</label>
+                <input type="text" id="nota" name="nota" placeholder="Escribí tu comentario...">
+            </section>
+
+            <button type="submit">Exportar a excel</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/exceljs/dist/exceljs.min.js"></script>
+    <script>
+        // Mostrar/ocultar menús de configuración según el sistema (Bobina o Distribuidor)
+        const sistemaRadios = document.querySelectorAll('input[name="sistema"]');
+        const submenuDistribuidor = document.getElementById("submenuDistribuidor"); // <-- La sección que había desaparecido
+        const seccionConfigBobina = document.getElementById('config-bobina-section');
+        const seccionConfigDistribuidor = document.getElementById('config-distribuidor-section');
+        const selectBobina = document.getElementById('combo_bobina');
+        const selectDistribuidor = document.getElementById('combo_distribuidor');
+
+        sistemaRadios.forEach(radio => {
+            radio.addEventListener("change", () => {
+                if (radio.value === "bobinas" && radio.checked) {
+                    // Si se elige BOBINAS:
+                    seccionConfigBobina.classList.remove("hidden");      // Muestra config. de bobina
+                    selectBobina.required = true;
+
+                    submenuDistribuidor.classList.add("hidden");        // Oculta las opciones detalladas de distribuidor
+                    seccionConfigDistribuidor.classList.add("hidden");  // Oculta la config. de distribuidor
+                    selectDistribuidor.required = false;
+
+                } else if (radio.value === "distribuidor" && radio.checked) {
+                    // Si se elige DISTRIBUIDOR:
+                    submenuDistribuidor.classList.remove("hidden");       // Muestra las opciones detalladas
+                    seccionConfigDistribuidor.classList.remove("hidden"); // Muestra la config. de distribuidor
+                    selectDistribuidor.required = true;
+
+                    seccionConfigBobina.classList.add("hidden");          // Oculta la config. de bobina
+                    selectBobina.required = false;
+                }
+            });
+        });
+        //Cilindros
+        const cilindrosSelect = document.getElementById("cilindros");
+        const largosCilindros = document.getElementById("largosCilindros");
+        const inputsLargos = document.getElementById("inputsLargos");
+
+        cilindrosSelect.addEventListener("change", () => {
+            const cantidad = parseInt(cilindrosSelect.value);
+            inputsLargos.innerHTML = ""; // limpiar inputs anteriores
+            if (!isNaN(cantidad)) {
+                largosCilindros.classList.remove("hidden");
+                for (let i = 1; i <= cantidad; i++) {
+                    const div = document.createElement("div");
+                    div.style.marginBottom = "6px";
+                    div.innerHTML = `
+                        <label>Cilindro ${i}:</label>
+                        <input type="text" name="largo_cil_${i}" placeholder="Ej: 30" required>
+                    `;
+                    inputsLargos.appendChild(div);
+                }
+            } else {
+                largosCilindros.classList.add("hidden");
+            }
+        });
+
+        const traducciones = {
+            "gol": "Bobina de GOL (PIN)",
+            "palio": "Bobina tipo Palio (DIN)",
+            "onix": "Bobina seca tipo Onix (PIN)",
+            "BA355": "Bobina Botella BA354/BA355",
+            "BA360": "Bobina seca BA360"
+        };
+
+        //codigos capuchones y pines DICCIONARIO
+        const codigosCapuchonBujia = {
+            // Modelos de la categoría "Recto"
+            "CF22": { capuchon: "[INSCAP1022] Capuchon Competicion 22", terminal: "[INSTER0096] Terminal 96" },
+            "CF05": { capuchon: "[INSCAP1005] Capuchon Competicion 5", terminal: "[INSTER0006] Terminal 6" },
+            // Modelos de la categoría "A 90°"
+            "90": "[INSCAP1074] Capuchon Competicion 74",
+            // Modelos de la categoría "Tipo Corsa"
+            "corsa": "[INSCAP2216] Capuchon Competicion 216 armado",
+            // Modelos de la categoría "Angulo"
+            "angulo": "[INSCAP1039] Capuchon Competicion 39"
+        };
+
+        const codigosTerminalBujia = {
+            "SAE": "[INSTER0096] Terminal 96",
+            "PIN": "[INSTER0005] Terminal 5"
+        };
+    
+        const codigosCapuchonBobina = {
+            "Recto": "[INSCAP1027] Capuchon Competicion 27",
+            "90": "[INSCAP1019] Capuchon Competicion 19"
+        };
+
+        const codigosTerminalBobina = {
+        "gol": "[INSTER0022] Terminal 22",
+        "palio": "[INSTER0092] Terminal 92",
+        "onix": "[INSTER0022] Terminal 22",
+        "BA355": "[INSTER0092] Terminal 92",
+        "BA360": "[INSTER0005] Terminal 5"
+        };
+
+        const datosBobinaCombinados = {
+        "gol_recto_pin":    { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0022] Terminal 22" },
+        "palio_90_din":     { capuchon: "[INSCAP1019] Capuchon Competicion 19", terminal: "[INSTER0092] Terminal 92" },
+        "onix_recto_pin":   { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0022] Terminal 22" },
+        "ba355_90_din":     { capuchon: "[INSCAP1019] Capuchon Competicion 19", terminal: "[INSTER0092] Terminal 92" },
+        "ba360_recto_sae":  { capuchon: "[INSCAP1027] Capuchon Competicion 27", terminal: "[INSTER0005] Terminal 5" }
+        // Asegúrate de que las claves aquí coincidan con los 'value' del <select> en el HTML
+        };
+
+        const datosDistribuidorCombinados = {
+        "dist_recto_din": { capuchon: "CODIGO-CAP-DIST-RECTO", terminal: "CODIGO-TERM-DIST-DIN" },
+        "dist_90_pin":  { capuchon: "CODIGO-CAP-DIST-90", terminal: "CODIGO-TERM-DIST-PIN" }
+        // Rellena con tus datos reales. Las claves deben coincidir con los 'value' del HTML
+        };
+
+        // DICCIONARIO PARA EL CABLE DEL DISTRIBUIDOR
+        const codigosLado1Tipo = {
+            "DIN": "Falta definir terminal para DIN lado 1",
+            "PIN": "Falta definir terminal para PIN lado 1",
+            "SAE": "Falta definir terminal para SAE lado 1"
+        };
+        const codigosLado1Angulo = {
+            "Recto": "Falta definir capuchon recto para lado 1 distribuidor",
+            "90°": "Falta definir capuchon 90° para lado 1 distribuidor"
+        };
+        const codigosLado2Tipo = {
+            "DIS": "Falta definir terminal para DIS lado 2",
+            "DIN": "Falta definir terminal para DIN lado 2",
+            "PIN": "Falta definir terminal para PIN lado 2",
+            "SAE": "Falta definir terminal para SAE lado 2"
+        };
+        const codigosLado2Angulo = {
+            "Recto": "Falta definir capuchon recto para lado 2 distribuidor",
+            "90°": "Falta definir capuchon 90° para lado 2 distribuidor"
+        };
+
+        //-------------------------------------------------------------
+
+        document.getElementById("formCables").addEventListener("submit", async function(e){
+            e.preventDefault();
+            const form = e.target;
+
+            // ✅ CORRECCIÓN 1: Obtener la cantidad de cilindros directamente del formulario.
+            const cantidadCilindros = parseInt(form.cilindros.value) || 0;
+            
+            // Capturar largos de cada cilindro en un array
+            const largosArray = [];
+            for (let i = 1; i <= cantidadCilindros; i++) {
+                const val = form[`largo_cil_${i}`]?.value || "";
+                largosArray.push(val);
+            }
+
+            // --- Función para obtener el valor final del capuchón de bujía ---
+            const getCapuchonBujiaValue = () => {
+            const categoria = form.querySelector('input[name="cap_bujia_categoria"]:checked');
+            if (!categoria) return ""; // Si no hay nada seleccionado, devuelve vacío
+
+            const categoriaValue = categoria.value;
+            if (categoriaValue === 'otro') {
+                return form.cap_bujia_otro.value;
+            } else {
+                const selectDelModelo = form.querySelector(`select[name="modelo_${categoriaValue}"]`);
+                return selectDelModelo ? selectDelModelo.value : "";
+            }
+            };
+
+            // --- INICIO: CAPTURA DE DATOS UNIFICADA ---
+
+            // Datos cliente
+            const datosCliente = {
+            cilindros: form.cilindros.value,
+            sistema: form.sistema.value,
+            cap_bujia: getCapuchonBujiaValue(),
+            nota: form.nota.value,
+            medidas: largosArray.join(" | ")
+            };
+
+        // Datos técnicos y lógicos
+        const modeloCapuchonSeleccionado = getCapuchonBujiaValue();
+        const datosCombinadosBujia = codigosCapuchonBujia[modeloCapuchonSeleccionado] || {};
+        
+        let capuchonLadoMotor = "";
+        let terminalLadoMotor = "";
+        let descripcionLadoMotor = "";
+
+        // Verificamos qué sistema se eligió para saber de dónde sacar los datos
+        if (datosCliente.sistema === 'bobinas') {
+            const comboBobinaSeleccionado = form.combo_bobina.value;
+            const datosComboBobina = datosBobinaCombinados[comboBobinaSeleccionado] || {};
+            capuchonLadoMotor = datosComboBobina.capuchon || "Capuchón Bobina no definido";
+            terminalLadoMotor = datosComboBobina.terminal || "Terminal Bobina no definido";
+            descripcionLadoMotor = form.combo_bobina.options[form.combo_bobina.selectedIndex].text;
+
+        } else if (datosCliente.sistema === 'distribuidor') {
+            const comboDistribuidorSeleccionado = form.combo_distribuidor.value;
+            const datosComboDistribuidor = datosDistribuidorCombinados[comboDistribuidorSeleccionado] || {};
+            capuchonLadoMotor = datosComboDistribuidor.capuchon || "Capuchón Distribuidor no definido";
+            terminalLadoMotor = datosComboDistribuidor.terminal || "Terminal Distribuidor no definido";
+            descripcionLadoMotor = form.combo_distribuidor.options[form.combo_distribuidor.selectedIndex].text;
+        }
+
+        // Agregamos la descripción al objeto datosCliente para usarla en la Fila Cliente
+        datosCliente.configuracion_lado_motor = descripcionLadoMotor;
+
+        const datosTecnicos = {
+            cilindros: datosCliente.cilindros,
+            sistema: datosCliente.sistema,
+            medidas: datosCliente.medidas,
+            terminal_bujia: datosCombinadosBujia.terminal || "Terminal no definido",
+            cap_bujia: datosCombinadosBujia.capuchon || modeloCapuchonSeleccionado,
+            
+            // Asignamos los códigos correspondientes al sistema elegido
+            terminal_bobina: terminalLadoMotor,
+            cap_bobina: capuchonLadoMotor,
+        };
+        // --- FIN: CAPTURA DE DATOS UNIFICADA ---
+
+            // --- Generar el texto para la columna "Articulo" ---
+            const articulos = largosArray.map(largo => {
+                if (!largo) return ""; // Si no hay largo, no crear artículo
+                
+                // Construimos la cadena con el formato: "Largo, Terminales/Capuchones"
+                const terminales = `${datosTecnicos.terminal_bujia}-${datosTecnicos.terminal_bobina}`;
+                const capuchones = `${datosTecnicos.cap_bujia}-${datosTecnicos.cap_bobina}`;
+                
+                return `${largo} cm, ${terminales}/${capuchones}`;
+            });
+            
+            // Unimos todos los artículos en un solo texto, separados por un salto de línea
+            const textoArticulosParaCelda = articulos.join('\n');
+
+
+            //const datosTecnicos = {
+            //cilindros: datosCliente.cilindros,
+            //sistema: datosCliente.sistema,
+            //medidas: datosCliente.medidas,
+            
+            // Si encuentra el código en el mapa, lo usa. Si no (ej: "otro"), pone el texto original.
+            //terminal_bujia: codigosTerminalBujia[datosCliente.terminal_bujia] || datosCliente.terminal_bujia,
+            //cap_bujia: codigosCapuchonBujia[datosCliente.cap_bujia] || datosCliente.cap_bujia,
+            //terminal_bobina: codigosTerminalBobina[form.terminal_bobina.value] || datosCliente.terminal_bobina,
+            //cap_bobina: codigosCapuchonBobina[datosCliente.cap_bobina] || datosCliente.cap_bobina,
+            //};
+
+            // Crear Excel
+            const workbook = new ExcelJS.Workbook();
+            const sheet = workbook.addWorksheet("Pedido");
+
+            // Encabezados dinámicos
+            const encabezadosCilindros = [];
+            for (let i = 1; i <= cantidadCilindros; i++) {
+                encabezadosCilindros.push("Largo Cilindro " + i);
+            }
+
+            // Fila de Encabezados
+            const headers = [ "Cilindros", "Sistema", ...encabezadosCilindros ];
+
+            // Añadir encabezados de distribuidor si fue seleccionado
+            if (datosCliente.sistema === 'distribuidor') {
+                headers.push("Lado 1 Tipo (Distribuidor)", "Lado 1 Ángulo (Distribuidor)", "Lado 2 Tipo (Distribuidor)", "Lado 2 Ángulo (Distribuidor)", "Largo Cable Distribuidor");
+            }
+
+            headers.push(
+                "Terminal Bujía",
+                "Capuchón Bujía",
+                "Terminal Bobina",
+                "Capuchón Bobina",
+                "Nota"
+            );
+            sheet.addRow(headers);
+
+
+            // Fila cliente
+            const filaClienteData = [ datosCliente.cilindros, datosCliente.sistema, ...largosArray ];
+
+            if (datosCliente.sistema === 'distribuidor') {
+                filaClienteData.push(datosCliente.lado1_tipo, datosCliente.lado1_angulo, datosCliente.lado2_tipo, datosCliente.lado2_angulo, datosCliente.largo_cable);
+            }
+
+            filaClienteData.push(
+            datosTecnicos.terminal_bujia, 
+            datosCliente.cap_bujia,
+            datosCliente.configuracion_lado_motor, // <-- Nueva variable unificada
+            datosCliente.nota
+            );
+
+            const filaCliente = sheet.addRow(filaClienteData);
+            filaCliente.eachCell(cell => cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' });
+
+            // Fila técnica
+
+            // 1. CREAMOS EL NUEVO ARRAY CON LOS CÁLCULOS
+            const largosTecnicos = largosArray.map(largoCm => {
+                // Convertimos el valor a número para poder hacer cálculos
+                const valorNumerico = parseFloat(largoCm);
+
+                // Verificamos si es un número válido. Si no, dejamos la celda vacía.
+                if (isNaN(valorNumerico)) {
+                    return ""; // O puedes poner "Error" o 0 si prefieres
+                }
+
+                // Aplicamos la fórmula: (valor / 100) + 0.035
+                const resultado = (valorNumerico / 100) + 0.035;
+
+                // Devolvemos el resultado con 3 decimales para evitar números largos
+                return parseFloat(resultado.toFixed(3)); 
+            });
+
+            // 2. USAMOS EL NUEVO ARRAY CALCULADO EN LA FILA TÉCNICA
+            const filaTecnicaData = [ datosTecnicos.cilindros, datosTecnicos.sistema, ...largosTecnicos ];
+
+            if (datosCliente.sistema === 'distribuidor') {
+            const largoCableDistCm = parseFloat(datosCliente.largo_cable);
+            let largoCableDistTecnico = "";
+            if (!isNaN(largoCableDistCm)) {
+                largoCableDistTecnico = parseFloat(((largoCableDistCm / 100) + 0.035).toFixed(3));
+            }
+
+            // Usamos los nuevos diccionarios para buscar los códigos
+            filaTecnicaData.push(
+                codigosLado1Tipo[datosCliente.lado1_tipo] || datosCliente.lado1_tipo,
+                codigosLado1Angulo[datosCliente.lado1_angulo] || datosCliente.lado1_angulo,
+                codigosLado2Tipo[datosCliente.lado2_tipo] || datosCliente.lado2_tipo,
+                codigosLado2Angulo[datosCliente.lado2_angulo] || datosCliente.lado2_angulo,
+                largoCableDistTecnico
+            );
+            }
+
+            filaTecnicaData.push(
+                datosTecnicos.terminal_bujia,
+                datosTecnicos.cap_bujia,
+                datosTecnicos.terminal_bobina,
+                datosTecnicos.cap_bobina,
+                datosTecnicos.codigo || "" 
+            );
+
+            const filaTecnica = sheet.addRow(filaTecnicaData);
+            filaTecnica.eachCell(cell=>{
+                cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFA500'}};
+                cell.alignment={wrapText:true,vertical:'middle',horizontal:'center'};
+            });
+            
+                // --- INICIO: CÓDIGO PARA CREAR LA TABLA DE ARTÍCULOS EN D12 ---
+                const filaInicioArticulos = 12; // Fila donde comenzará la nueva tabla
+                const columnaArticulos = 'D';   // Columna donde estará
+
+                // Escribir el encabezado "Articulo" en la celda D12
+                const headerCell = sheet.getCell(`${columnaArticulos}${filaInicioArticulos}`);
+                headerCell.value = 'Articulo';
+                headerCell.font = { bold: true };
+                headerCell.border = { bottom: { style: 'thin' } };
+                headerCell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' }; // <-- LÍNEA AGREGADA
+
+                // Recorrer la lista de artículos que ya generamos antes
+                articulos.forEach((articulo, index) => {
+                    // Calculamos la fila actual (13, 14, 15, ...)
+                    const filaActual = filaInicioArticulos + 1 + index;
+                    const celdaArticulo = sheet.getCell(`${columnaArticulos}${filaActual}`);
+                    celdaArticulo.value = articulo;
+                    celdaArticulo.alignment = { wrapText: true, vertical: 'middle' }; // <-- LÍNEA AGREGADA
+                });
+                // --- FIN: CÓDIGO PARA CREAR LA TABLA DE ARTÍCULOS ---
+
+            // Ajustar ancho
+            sheet.columns.forEach(col => col.width = 25);
+
+            // Descargar
+            const buf = await workbook.xlsx.writeBuffer();
+            const blob = new Blob([buf],{type:"application/octet-stream"});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "pedido_completo.xlsx";
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // --- LÓGICA PARA LOS SUBMENÚS DE CAPUCHONES DE BUJÍA ---
+        const categoriaRadios = document.querySelectorAll('input[name="cap_bujia_categoria"]');
+        const todosLosSubmenus = document.querySelectorAll('.submenu-capuchon, #submenu-otro');
+
+        // Habilitar/deshabilitar campos según la selección
+        const toggleRequired = (submenu, required) => {
+            const field = submenu.querySelector('select, input');
+            if (field) {
+                field.required = required;
+            }
+        };
+
+        categoriaRadios.forEach(radio => {
+            radio.addEventListener('change', (event) => {
+                // 1. Ocultar todos los submenús y quitar 'required'
+                todosLosSubmenus.forEach(submenu => {
+                    submenu.classList.add('hidden');
+                    toggleRequired(submenu, false);
+                });
+
+                // 2. Mostrar el submenú correspondiente y agregar 'required'
+                const categoriaSeleccionada = event.target.value;
+                if (categoriaSeleccionada !== 'otro') {
+                    const submenuAMostrar = document.getElementById(`submenu-${categoriaSeleccionada}`);
+                    if (submenuAMostrar) {
+                        submenuAMostrar.classList.remove('hidden');
+                        toggleRequired(submenuAMostrar, true);
+                    }
+                } else {
+                    const submenuOtro = document.getElementById('submenu-otro');
+                    if(submenuOtro) {
+                        submenuOtro.classList.remove('hidden');
+                        toggleRequired(submenuOtro, true);
+                    }
+                }
+            });
+        });
+    </script>
+
+
+</body>
+</html>
