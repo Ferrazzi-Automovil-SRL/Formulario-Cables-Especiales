@@ -24,7 +24,7 @@
     .card-container{display:flex;justify-content:center;align-items:center;gap:20px;flex-wrap:wrap;margin-top:20px;}
     .cards{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #ccc;border-radius:8px;padding:10px;cursor:pointer;width:300px;text-align:center;box-sizing:border-box;}
     .cards input[type="radio"]{margin-bottom:8px;}
-    .cards img{max-width:100%;height:auto;max-height:300px;margin-bottom:6px;}
+    .cards img{max-width:100%;height:auto;max-height:300px;margin-bottom:6px; border-radius: 6px;}
     .banner-img{width:100%;height:auto;display:block;border-radius:8px;}
     /*ocultar submenu*/
     .hidden {display: none;}
@@ -43,7 +43,7 @@
     <div class="container">
         <!-- Banner superior -->
         <div class="banner">
-            <img src="./images/1x/bannerFerrazzi.jpg" alt="Ferrazzi" class="banner-img">
+            <img src="./images/1x/bannerFerrazzi.png" alt="Ferrazzi" class="banner-img">
         </div>
     </div>
 
@@ -133,10 +133,10 @@
                 <div id="visual-selection-container" class="hidden">
                     <label style="margin-top:20px;">Paso 1: Seleccione una categoría</label>
                     <div class="options card-container">
-                        <label class="cards"><img src="./images/1x/RECTO_BUJIA.jpg" alt="RECTO"><span>Recto</span><input type="radio" name="cap_bujia_categoria" value="recto" data-single-model="true" data-model-value="CF22"  ></label>
-                        <label class="cards"><img src="./images/1x/A90_BUJIA.jpg" alt="A 90"><span>A 90°</span><input type="radio" name="cap_bujia_categoria" value="90"></label>
-                        <label class="cards"><img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="TIPO CORSA"><span>Recto, tipo Corsa</span><input type="radio" name="cap_bujia_categoria" value="corsa" data-single-model="true" data-model-value="Corsa Classic"> </label>
-                        <label class="cards"><img src="./images/1x/ANGULO_BUJIA.jpg" alt="EN ANGULO"><span>En ángulo</span><input type="radio" name="cap_bujia_categoria" value="angulo"></label>
+                        <label class="cards"><img src="./images/1x/CF22_RECTO.png" alt="RECTO"><span>Recto</span><input type="radio" name="cap_bujia_categoria" value="recto" data-single-model="true" data-model-value="CF22"  ></label>
+                        <label class="cards"><img src="./images/1x/CF19_90.png" alt="A 90"><span>A 90°</span><input type="radio" name="cap_bujia_categoria" value="90"></label>
+                        <!--<label class="cards"><img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="TIPO CORSA"><span>Recto, tipo Corsa</span><input type="radio" name="cap_bujia_categoria" value="corsa" data-single-model="true" data-model-value="Corsa Classic"> </label>-->
+                        <label class="cards"><img src="./images/1x/CF39_ANGULO.png" alt="EN ANGULO"><span>En ángulo</span><input type="radio" name="cap_bujia_categoria" value="angulo"></label>
                     </div>
 
                     <div id="submenus-capuchones" class="submenu-container">
@@ -150,9 +150,10 @@
                         <div id="submenu-90" class="submenu-capuchon hidden">
                             <label>Paso 2: Seleccione el modelo</label>
                             <div class="options card-container">
-                                <label class="cards model-card"><img src="./images/1x/CF19.jpg" alt="Modelo X"><span>CF19</span><input type="radio" name="cap_bujia_modelo_final" value="CF19"></label>
-                                <label class="cards model-card"><img src="./images/1x/CF24.jpg" alt="Modelo X"><span>CF24</span><input type="radio" name="cap_bujia_modelo_final" value="CF24"></label>
-                                <label class="cards model-card"><img src="./images/1x/CF230.jpg" alt="Modelo X"><span>CF230</span><input type="radio" name="cap_bujia_modelo_final" value="CF230"></label>
+                                <label class="cards model-card"><img src="./images/1x/CF19_90.png" alt="CF19"><span>CF19</span><input type="radio" name="cap_bujia_modelo_final" value="CF19"></label>
+                                <label class="cards model-card"><img src="./images/1x/CF16_90.png" alt="CF16"><span>CF16</span><input type="radio" name="cap_bujia_modelo_final" value="CF16"></label>
+                                <!--<label class="cards model-card"><img src="./images/1x/CF24.jpg" alt="Modelo X"><span>CF24</span><input type="radio" name="cap_bujia_modelo_final" value="CF24"></label>-->
+                                <!--<label class="cards model-card"><img src="./images/1x/CF230.jpg" alt="Modelo X"><span>CF230</span><input type="radio" name="cap_bujia_modelo_final" value="CF230"></label>-->
                             </div>
                         </div>
                         <div id="submenu-corsa" class="submenu-capuchon hidden">
@@ -164,8 +165,8 @@
                         <div id="submenu-angulo" class="submenu-capuchon hidden">
                             <label>Paso 2: Seleccione el modelo</label>
                             <div class="options card-container">
-                                <label class="cards model-card"><img src="./images/1x/CF15.jpg" alt="Angulo 45 CF15"><span>CF15</span><input type="radio" name="cap_bujia_modelo_final" value="CF15"></label>
-                                <label class="cards model-card"><img src="./images/1x/CF39.jpg" alt="Angulo 45 CF39"><span>CF39</span><input type="radio" name="cap_bujia_modelo_final" value="CF39"></label>
+                                <label class="cards model-card"><img src="./images/1x/CF15_ANGULO.png" alt="Angulo 45 CF15"><span>CF15</span><input type="radio" name="cap_bujia_modelo_final" value="CF15"></label>
+                                <label class="cards model-card"><img src="./images/1x/CF39_ANGULO.png" alt="Angulo 45 CF39"><span>CF39</span><input type="radio" name="cap_bujia_modelo_final" value="CF39"></label>
                             </div>
                         </div>
                     </div>
@@ -389,6 +390,7 @@
             "CF39": { capuchon: "CF39", terminal: "T96" },
             "CF05": { capuchon: "CF05", terminal: "T06" },
             "CF19": { capuchon: "CF19", terminal: "T05" },
+            "CF16": { capuchon: "CF16", terminal: "T05" },
             "CF24": { capuchon: "CF24", terminal: "T05" },
             "CF230": { capuchon: "CF230", terminal: "T22" },
             "Corsa Classic": { capuchon: "CF216", terminal: "T216" }, // deberia funcionar
