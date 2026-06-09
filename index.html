@@ -120,23 +120,44 @@
                 <label>Largo de cables por cilindro (cm):</label>
                 <div id="inputsLargos"></div>
             </section>
+            <!-- Nuevo para tipo de cable -->
+            <section>
+                <label for="tipo_cable">Indicar tipo de cable <span class="required">*</span></label>
+                <select id="tipo_cable" name="tipo_cable" required>
+                    <option value="">Elegir...</option>
+                    <option value="2005.0">Cable Silicona Cobre Negro 7 mm Ferrazzi</option>
+                    <option value="2006.0">Cable Silicona Supresor Negro 7 mm Ferrazzi</option>
+                    <option value="2014.0">Cable Silicona Supresor Espiralado Naranja 7 mm Ferrazzi</option>
+                    <option value="2010.0">Cable Silicona Cobre/Acero 8.8 mm Ferrazzi</option>
+                    <option value="2011.0">Cable Silicona Supresor Naranja 8.8 mm Ferrazzi</option>
+                    <option value="2021.0">Cable Silicona Supresor Espiralado Naranja 8.8 mm Ferrazzi</option>
+                </select>
+            </section>
 
             <!-- Capuchones lado bujías -->
             <section>
                 <label>Tipo de Capuchones, lado Bujías <span class="required">*</span></label>
-                
+                <!--
                 <div class="options">
                     <label><input type="radio" name="metodo_seleccion_bujia" value="visual" required> Selección Visual</label>
                     <label><input type="radio" name="metodo_seleccion_bujia" value="codigo" required> Ingresar Código de Catálogo</label>
                 </div>
+                -->
 
-                <div id="visual-selection-container" class="hidden">
+                <div id="visual-selection-container"> <!--este div tenia el class="hidden" cuando tenias que seleccionar la categoria -->
+                    <!--  
                     <label style="margin-top:20px;">Paso 1: Seleccione una categoría</label>
                     <div class="options card-container">
                         <label class="cards"><img src="./images/1x/CF22_RECTO.png" alt="RECTO"><span>Recto</span><input type="radio" name="cap_bujia_categoria" value="recto" data-single-model="true" data-model-value="CF22"  ></label>
                         <label class="cards"><img src="./images/1x/CF19_90.png" alt="A 90"><span>A 90°</span><input type="radio" name="cap_bujia_categoria" value="90"></label>
-                        <!--<label class="cards"><img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="TIPO CORSA"><span>Recto, tipo Corsa</span><input type="radio" name="cap_bujia_categoria" value="corsa" data-single-model="true" data-model-value="Corsa Classic"> </label>-->
+                        <label class="cards"><img src="./images/1x/RECTO_TIPOCORSA.jpg" alt="TIPO CORSA"><span>Recto, tipo Corsa</span><input type="radio" name="cap_bujia_categoria" value="corsa" data-single-model="true" data-model-value="Corsa Classic"> </label>
                         <label class="cards"><img src="./images/1x/CF39_ANGULO.png" alt="EN ANGULO"><span>En ángulo</span><input type="radio" name="cap_bujia_categoria" value="angulo"></label>
+                    </div> -->
+                    <label style="margin-top:20px;">Paso 1: Seleccione una categoría <span class="required">*</span></label>
+                    <div class="options card-container">
+                        <label class="cards "><img src="./images/1x/CF22_RECTO.png" alt="RECTO"><span>Recto</span><input type="radio" name="cap_bujia_categoria" value="recto" data-single-model="true" data-model-value="CF22" required></label>
+                        <label class="cards "><img src="./images/1x/CF19_90.png" alt="A 90"><span>A 90°</span><input type="radio" name="cap_bujia_categoria" value="90" required></label>
+                        <label class="cards "><img src="./images/1x/CF39_ANGULO.png" alt="EN ANGULO"><span>En ángulo</span><input type="radio" name="cap_bujia_categoria" value="angulo" required></label>
                     </div>
 
                     <div id="submenus-capuchones" class="submenu-container">
@@ -148,7 +169,7 @@
                             </div>
                         </div>
                         <div id="submenu-90" class="submenu-capuchon hidden">
-                            <label>Paso 2: Seleccione el modelo</label>
+                            <label>Paso 2: Seleccione el modelo<span class="required">*</span></label>
                             <div class="options card-container">
                                 <label class="cards model-card"><img src="./images/1x/CF19_90.png" alt="CF19"><span>CF19</span><input type="radio" name="cap_bujia_modelo_final" value="CF19"></label>
                                 <label class="cards model-card"><img src="./images/1x/CF16_90.png" alt="CF16"><span>CF16</span><input type="radio" name="cap_bujia_modelo_final" value="CF16"></label>
@@ -163,7 +184,7 @@
                             </div>
                         </div>
                         <div id="submenu-angulo" class="submenu-capuchon hidden">
-                            <label>Paso 2: Seleccione el modelo</label>
+                            <label>Paso 2: Seleccione el modelo<span class="required">*</span></label>
                             <div class="options card-container">
                                 <label class="cards model-card"><img src="./images/1x/CF15_ANGULO.png" alt="Angulo 45 CF15"><span>CF15</span><input type="radio" name="cap_bujia_modelo_final" value="CF15"></label>
                                 <label class="cards model-card"><img src="./images/1x/CF39_ANGULO.png" alt="Angulo 45 CF39"><span>CF39</span><input type="radio" name="cap_bujia_modelo_final" value="CF39"></label>
@@ -172,10 +193,12 @@
                     </div>
                 </div>
 
+                <!--  
                 <div id="codigo-selection-container" class="hidden">
                     <label for="clase_producto_bujia" style="margin-top:20px;">Ingrese la Clase de Producto del catálogo:</label>
                     <input type="text" id="clase_producto_bujia" name="clase_producto_bujia" placeholder="Ej: A02-96">
                 </div>
+                -->
             </section>
 
             <!-- Nueva seccion que contempla Terminales y capuchones de las bobinas y del distribuidor segun lo que elija el user mas arriba -->
@@ -286,6 +309,7 @@
     const form = document.getElementById('formCables'); // Referencia al formulario
 
     // Lógica para elegir el MÉTODO
+    /*
     radiosMetodoBujia.forEach(radio => {
         radio.addEventListener('change', () => {
              // Resetear radios de categoría y modelo al cambiar de método
@@ -308,6 +332,7 @@
             }
         });
     });
+    */
 
     // Lógica para la SELECCIÓN VISUAL (Categorías y Modelos)
     radiosCategoriaVisual.forEach(radioCategoria => {
@@ -465,6 +490,7 @@
 
             // Función para obtener los datos del lado Bujía (visual o por código)
             const getDatosBujia = () => {
+                /*
                 const metodoSeleccionado = form.querySelector('input[name="metodo_seleccion_bujia"]:checked');
                 if (!metodoSeleccionado) return { datosTecnicos: {}, valorCliente: "" };
 
@@ -480,12 +506,25 @@
                     }
                 }
                 return { datosTecnicos: {}, valorCliente: "" };
+            };*/
+                const modeloVisual = form.querySelector('input[name="cap_bujia_modelo_final"]:checked');
+                if (modeloVisual) {
+                    const nombreModelo = modeloVisual.value;
+                    return { datosTecnicos: codigosCapuchonBujia[nombreModelo] || {}, valorCliente: nombreModelo };
+                }
+                return { datosTecnicos: {}, valorCliente: "" };
             };
 
             // 1. Capturar todos los datos del formulario
             const largosArray = Array.from({ length: parseInt(form.cilindros.value) || 0 }, (_, i) => form[`largo_cil_${i + 1}`]?.value || "");
             const seleccionBujia = getDatosBujia();
             const sistema = form.sistema.value;
+
+            // NUEVO: Capturamos el tipo de cable (nombre para cliente, código para técnico)
+            const selectCable = form.tipo_cable;
+            const codigoCable = selectCable.value;
+            const nombreCable = selectCable.options[selectCable.selectedIndex]?.text || "";
+
 
             let capuchonLadoMotor = "", terminalLadoMotor = "", descripcionLadoMotor = "";
             
@@ -547,19 +586,20 @@
                 // Usamos los códigos técnicos generales (bobina/dist combo) para los cables de cilindro
                 const terminales = `${datosTecnicos.terminal_bujia}-${datosTecnicos.terminal_bobina}`;
                 const capuchones = `${datosTecnicos.cap_bujia}-${datosTecnicos.cap_bobina}`;
-                return `${largo} cm, ${terminales}/${capuchones}`;
+                // FORMATO NUEVO CON CÓDIGO
+                return `${codigoCable} largo ${largo} cm, ${terminales}/${capuchones}`;
             });
 
             // NUEVO: Añadir el cable del distribuidor a la lista si aplica
-            let esCableDistribuidor = false; // Variable para marcar si el último ítem es el cable especial
+            let esCableDistribuidor = false; 
             if (sistema === 'distribuidor' && datosCliente.distribuidor_largo_cable_cm) {
                 const largoDist = datosCliente.distribuidor_largo_cable_cm;
-                // Usamos los códigos técnicos específicos del CABLE del distribuidor
                 const terminalesDist = `${datosTecnicos.cable_dist_term1}-${datosTecnicos.cable_dist_term2}`;
                 const capuchonesDist = `${datosTecnicos.cable_dist_cap1}-${datosTecnicos.cable_dist_cap2}`;
-                const descripcionCableDistribuidor = `${largoDist} cm, ${terminalesDist}/${capuchonesDist} (Cable Distribuidor)`;
-                articulos.push(descripcionCableDistribuidor); // Lo agregamos al final
-                esCableDistribuidor = true; // Marcamos que el último ítem es este cable
+                // FORMATO NUEVO CON CÓDIGO
+                const descripcionCableDistribuidor = `${codigoCable} largo ${largoDist} cm, ${terminalesDist}/${capuchonesDist} (Cable Distribuidor)`;
+                articulos.push(descripcionCableDistribuidor); 
+                esCableDistribuidor = true; 
             }
 
             // 4. Crear y llenar el archivo Excel
@@ -568,7 +608,7 @@
             // --- INICIO: Agregar Fila de Título Principal ---
             const titleRow = sheet.addRow(['Cables Especiales']);
             // Fusiona celdas (ajusta la 'G' si tienes más o menos columnas fijas antes de los largos)
-            sheet.mergeCells('A1:G1'); 
+            sheet.mergeCells('A1:J1'); 
             const titleCell = sheet.getCell('A1');
             titleCell.font = { size: 16, bold: true };
             titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
@@ -579,7 +619,7 @@
             // --- FIN: Agregar Fila de Título Principal ---
             
             // Fila de Encabezados (AJUSTADA PARA COMBINAR)
-            const headers = ["Cilindros", "Sistema", ...largosArray.map((_, i) => `Largo Cilindro ${i + 1}`)];
+            const headers = ["Cilindros", "Tipo de Cable", "Sistema", ...largosArray.map((_, i) => `Largo Cilindro ${i + 1}`)];
             
             if (sistema === 'distribuidor') {
                 // Encabezados para el CABLE del distribuidor (mostrando datos del cliente)
@@ -599,7 +639,7 @@
             sheet.addRow(headers);
 
             // Fila Cliente
-            const filaClienteData = [datosCliente.cilindros, datosCliente.sistema, ...largosArray];
+            const filaClienteData = [datosCliente.cilindros, nombreCable, datosCliente.sistema, ...largosArray];
             if (sistema === 'distribuidor') {
                 filaClienteData.push(
                 datosCliente.distribuidor_lado1_desc,
@@ -612,7 +652,7 @@
 
             // Fila Técnica (COMBINANDO CÓDIGOS)
             const largosTecnicos = largosArray; // Largos originales
-            const filaTecnicaData = [datosCliente.cilindros, datosCliente.sistema, ...largosTecnicos];
+            const filaTecnicaData = [datosCliente.cilindros, codigoCable, datosCliente.sistema, ...largosTecnicos];
 
             // Combinar códigos técnicos en strings
             const ladoBujiaTec = `${datosTecnicos.cap_bujia} / ${datosTecnicos.terminal_bujia}`;
