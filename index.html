@@ -67,6 +67,7 @@
                 <div class="options">
                     <label><input type="radio" name="sistema" value="bobinas" required> Bobinas individuales</label>
                     <label><input type="radio" name="sistema" value="distribuidor"> Distribuidor</label>
+                    <label><input type="radio" name="sistema" value="otro"> Otro (Personalizado por cable)</label>
                 </div>
             </section>
             <!-- SUBMENÚ PARA DISTRIBUIDOR -->
@@ -234,6 +235,26 @@
                 </select>
             </section>
 
+            <!-- Seccion OTRO -->
+            <section id="config-otro-section" class="hidden">
+                <h3>Configuración Personalizada</h3>
+                <label for="cantidad_cables_otro">Indicar la cantidad de cables <span class="required">*</span></label>
+                <select id="cantidad_cables_otro" name="cantidad_cables_otro">
+                    <option value="">Elegir...</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                </select>
+
+                <div id="contenedor-cables-otro" style="margin-top: 20px;">
+                </div>
+            </section>
+
             <!-- Nota final -->
             <section>
                 <label for="nota">¿Tenés algo que quieras agregar sobre tu pedido? Escribilo acá ⚡</label>
@@ -248,30 +269,122 @@
     <script>
         // --- LÓGICA DE VISIBILIDAD DEL FORMULARIO ---
 
-        // 1. Lógica para Sistema (Bobina vs Distribuidor)
+        // 1. Lógica para Sistema (Bobina vs Distribuidor vs Otro)
         const sistemaRadios = document.querySelectorAll('input[name="sistema"]');
         const submenuDistribuidor = document.getElementById("submenuDistribuidor");
         const seccionConfigBobina = document.getElementById('config-bobina-section');
         const seccionConfigDistribuidor = document.getElementById('config-distribuidor-section');
+        const seccionConfigOtro = document.getElementById('config-otro-section');
         const selectBobina = document.getElementById('combo_bobina');
         const selectDistribuidor = document.getElementById('combo_distribuidor');
+        const selectCantidadOtro = document.getElementById('cantidad_cables_otro');
+        
+        // Elementos comunes que deben ocultarse si es "Otro"
+        const seccionCilindrosComun = document.getElementById('cilindros').closest('section');
+        const seccionLargosComun = document.getElementById('largosCilindros');
+        const seccionTipoCableComun = document.getElementById('tipo_cable').closest('section');
+        const seccionCapuchonesBujiaComun = document.getElementById('visual-selection-container').closest('section');
 
         sistemaRadios.forEach(radio => {
             radio.addEventListener("change", () => {
+                // Resetear estado general
+                submenuDistribuidor.classList.add("hidden");
+                seccionConfigDistribuidor.classList.add("hidden");
+                seccionConfigBobina.classList.add("hidden");
+                seccionConfigOtro.classList.add("hidden");
+                selectDistribuidor.required = false;
+                selectBobina.required = false;
+                selectCantidadOtro.required = false;
+
+                // Mostrar/ocultar elementos comunes
+                const esOtro = (radio.value === "otro" && radio.checked);
+                seccionCilindrosComun.classList.toggle("hidden", esOtro);
+                if (esOtro) seccionLargosComun.classList.add("hidden"); // Ocultar si o si al cambiar a otro
+                seccionTipoCableComun.classList.toggle("hidden", esOtro);
+                seccionCapuchonesBujiaComun.classList.toggle("hidden", esOtro);
+                
+                // Si NO es "otro", asegurarnos que los campos comunes sean requeridos
+                document.getElementById('cilindros').required = !esOtro;
+                document.getElementById('tipo_cable').required = !esOtro;
+                
+                // CORRECCIÓN: Quitar el "required" de la sección visual si está oculta para que el formulario se deje enviar
+                document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(r => r.required = !esOtro);
+                if (esOtro) {
+                    document.querySelectorAll('input[name="cap_bujia_modelo_final"]').forEach(r => r.required = false);
+                }
+
                 if (radio.value === "bobinas" && radio.checked) {
                     seccionConfigBobina.classList.remove("hidden");
                     selectBobina.required = true;
-                    submenuDistribuidor.classList.add("hidden");
-                    seccionConfigDistribuidor.classList.add("hidden");
-                    selectDistribuidor.required = false;
                 } else if (radio.value === "distribuidor" && radio.checked) {
                     submenuDistribuidor.classList.remove("hidden");
                     seccionConfigDistribuidor.classList.remove("hidden");
                     selectDistribuidor.required = true;
-                    seccionConfigBobina.classList.add("hidden");
-                    selectBobina.required = false;
+                } else if (radio.value === "otro" && radio.checked) {
+                    seccionConfigOtro.classList.remove("hidden");
+                    selectCantidadOtro.required = true;
                 }
             });
+        });
+
+        // Lógica para Generar Campos Personalizados ("Otro")
+        const contenedorCablesOtro = document.getElementById('contenedor-cables-otro');
+        const selectTipoCableHTML = document.getElementById('tipo_cable').innerHTML; // Clonar las opciones del select original
+        
+        // Extraer las opciones de los selectores originales para reusarlas
+        const opcionesLadoBobina = document.getElementById('combo_bobina').innerHTML;
+        const opcionesLadoDistribuidor = document.getElementById('combo_distribuidor').innerHTML;
+        // Quitar el primer <option value="">Elegir combinación...</option> para no duplicarlo si los unimos
+        const cleanLadoDistribuidor = opcionesLadoDistribuidor.replace('<option value="">Elegir combinación...</option>', '');
+
+        // Lado 2 es la suma de todas las configuraciones (Bobina + Distribuidor)
+        const opcionesLado2 = opcionesLadoBobina + cleanLadoDistribuidor;
+
+        selectCantidadOtro.addEventListener('change', () => {
+            const cantidad = parseInt(selectCantidadOtro.value) || 0;
+            contenedorCablesOtro.innerHTML = ''; // Limpiar contenedor
+
+            for (let i = 1; i <= cantidad; i++) {
+                const bloqueCable = document.createElement('div');
+                bloqueCable.style.border = "1px solid #ccc";
+                bloqueCable.style.padding = "15px";
+                bloqueCable.style.marginBottom = "15px";
+                bloqueCable.style.borderRadius = "8px";
+                bloqueCable.style.backgroundColor = "#fdfdfd";
+
+                bloqueCable.innerHTML = `
+                    <h4 style="margin-top: 0;">Cable ${i}</h4>
+                    
+                    <label>Indique el tipo de cable <span class="required">*</span></label>
+                    <select name="otro_tipo_cable_${i}" required>
+                        ${selectTipoCableHTML}
+                    </select>
+
+                    <label>Largo (cm) <span class="required">*</span></label>
+                    <input type="text" name="otro_largo_${i}" placeholder="Ej: 45" required>
+
+                    <label>Tipo de conexión Lado 1 (Bobinas) <span class="required">*</span></label>
+                    <select name="otro_lado1_${i}" required>
+                        ${opcionesLadoBobina}
+                    </select>
+
+                    <label>Tipo de conexión Lado 2 (Bujía / Distribuidor) <span class="required">*</span></label>
+                    <select name="otro_lado2_${i}" required>
+                        <option value="">Elegir combinación...</option>
+                        <optgroup label="Lado Bujía">
+                            <option value="CF22">CF22</option>
+                            <option value="CF15">CF15</option>
+                            <option value="CF39">CF39</option>
+                            <option value="CF19">CF19</option>
+                            <option value="CF16">CF16</option>
+                        </optgroup>
+                        <optgroup label="Lado Disttribuidor">
+                            ${cleanLadoDistribuidor}
+                        </optgroup>
+                    </select>
+                `;
+                contenedorCablesOtro.appendChild(bloqueCable);
+            }
         });
 
         // 2. Lógica para Cilindros
@@ -295,7 +408,6 @@
             }
         });
 
-        // 3. Lógica para Selección de Capuchones de Bujía (Método, Categoría y Modelo)
         
         // 3. Lógica para Selección de Capuchones de Bujía (Método, Categoría y Modelo)
     const radiosMetodoBujia = document.querySelectorAll('input[name="metodo_seleccion_bujia"]');
@@ -359,15 +471,15 @@
                     radioModeloUnico.required = true; // Lo hace obligatorio
                     
                     // Añadir borde visual a la tarjeta de CATEGORÍA (no a la del modelo oculto)
-                     const cardCategoria = categoriaSeleccionadaElement.closest('.cards');
-                     if(cardCategoria){
+                    const cardCategoria = categoriaSeleccionadaElement.closest('.cards');
+                    if(cardCategoria){
                          // Quitar borde de otras categorías antes de poner el nuevo
-                         document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(rc => {
-                             const cardC = rc.closest('.cards');
+                        document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(rc => {
+                            const cardC = rc.closest('.cards');
                              if (cardC) cardC.classList.remove('selected-card'); // Usar la misma clase
-                         });
+                        });
                          cardCategoria.classList.add('selected-card'); // Poner borde a la categoría
-                     }
+                    }
 
                 } else {
                     console.error("No se encontró el radio button para el modelo único:", modeloUnicoValue);
@@ -377,10 +489,10 @@
             } else {
                  // --- CASO MÚLTIPLES MODELOS ---
                  // Quitar borde de selección de las categorías si se elige una múltiple
-                 document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(rc => {
-                     const cardC = rc.closest('.cards');
-                     if (cardC) cardC.classList.remove('selected-card');
-                 });
+                document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(rc => {
+                    const cardC = rc.closest('.cards');
+                    if (cardC) cardC.classList.remove('selected-card');
+                });
 
                 const submenuAMostrar = document.getElementById(`submenu-${categoriaValue}`);
                 if (submenuAMostrar) {
@@ -515,91 +627,133 @@
                 return { datosTecnicos: {}, valorCliente: "" };
             };
 
-            // 1. Capturar todos los datos del formulario
-            const largosArray = Array.from({ length: parseInt(form.cilindros.value) || 0 }, (_, i) => form[`largo_cil_${i + 1}`]?.value || "");
-            const seleccionBujia = getDatosBujia();
             const sistema = form.sistema.value;
+            const esModoOtro = (sistema === 'otro');
+            let datosCliente = {};
+            let articulos = [];
+            let headers = [];
+            let filaClienteData = [];
+            let filaTecnicaData = [];
+            let esCableDistribuidor = false;
 
-            // NUEVO: Capturamos el tipo de cable (nombre para cliente, código para técnico)
-            const selectCable = form.tipo_cable;
-            const codigoCable = selectCable.value;
-            const nombreCable = selectCable.options[selectCable.selectedIndex]?.text || "";
+            if (!esModoOtro) {
+                // --- LÓGICA ORIGINAL (BOBINA / DISTRIBUIDOR) ---
+                const largosArray = Array.from({ length: parseInt(form.cilindros.value) || 0 }, (_, i) => form[`largo_cil_${i + 1}`]?.value || "");
+                const seleccionBujia = getDatosBujia();
+                const selectCable = form.tipo_cable;
+                const codigoCable = selectCable.value;
+                const nombreCable = selectCable.options[selectCable.selectedIndex]?.text || "";
 
+                let capuchonLadoMotor = "", terminalLadoMotor = "", descripcionLadoMotor = "";
+                
+                if (sistema === 'bobinas') {
+                    const combo = form.combo_bobina;
+                    const datosCombo = datosBobinaCombinados[combo.value] || {};
+                    capuchonLadoMotor = datosCombo.capuchon;
+                    terminalLadoMotor = datosCombo.terminal;
+                    descripcionLadoMotor = combo.options[combo.selectedIndex]?.text;
+                } else if (sistema === 'distribuidor') {
+                    const combo = form.combo_distribuidor;
+                    const datosCombo = datosDistribuidorCombinados[combo.value] || {};
+                    capuchonLadoMotor = datosCombo.capuchon;
+                    terminalLadoMotor = datosCombo.terminal;
+                    descripcionLadoMotor = combo.options[combo.selectedIndex]?.text;
+                }
 
-            let capuchonLadoMotor = "", terminalLadoMotor = "", descripcionLadoMotor = "";
-            
-            if (sistema === 'bobinas') {
-                const combo = form.combo_bobina;
-                const datosCombo = datosBobinaCombinados[combo.value] || {};
-                capuchonLadoMotor = datosCombo.capuchon;
-                terminalLadoMotor = datosCombo.terminal;
-                descripcionLadoMotor = combo.options[combo.selectedIndex]?.text;
-            } else if (sistema === 'distribuidor') {
-                const combo = form.combo_distribuidor;
-                const datosCombo = datosDistribuidorCombinados[combo.value] || {};
-                capuchonLadoMotor = datosCombo.capuchon;
-                terminalLadoMotor = datosCombo.terminal;
-                descripcionLadoMotor = combo.options[combo.selectedIndex]?.text;
-            }
+                datosCliente = {
+                    cilindros: form.cilindros.value,
+                    sistema: sistema,
+                    cap_bujia: seleccionBujia.valorCliente,
+                    configuracion_lado_motor: descripcionLadoMotor,
+                    nota: form.nota.value,
+                    distribuidor_lado1_desc: (sistema === 'distribuidor' && form.lado1_tipo.selectedIndex > 0) ? form.lado1_tipo.options[form.lado1_tipo.selectedIndex].text : "",
+                    distribuidor_lado2_desc: (sistema === 'distribuidor' && form.lado2_tipo.selectedIndex > 0) ? form.lado2_tipo.options[form.lado2_tipo.selectedIndex].text : "",
+                    distribuidor_largo_cable_cm: (sistema === 'distribuidor') ? form.largo_cable.value : ""
+                };
 
-            // 2. Organizar datos para las filas del Excel
-            const datosCliente = {
-                cilindros: form.cilindros.value,
-                sistema: sistema,
-                cap_bujia: seleccionBujia.valorCliente, // Valor visual o código de clase
-                configuracion_lado_motor: descripcionLadoMotor, // Descripción bobina o distribuidor combo
-                nota: form.nota.value,
-                // Datos específicos del cable de distribuidor (si aplica)
-                distribuidor_lado1_desc: (sistema === 'distribuidor' && form.lado1_tipo.selectedIndex > 0) ? form.lado1_tipo.options[form.lado1_tipo.selectedIndex].text : "",
-                distribuidor_lado2_desc: (sistema === 'distribuidor' && form.lado2_tipo.selectedIndex > 0) ? form.lado2_tipo.options[form.lado2_tipo.selectedIndex].text : "",
-                distribuidor_largo_cable_cm: (sistema === 'distribuidor') ? form.largo_cable.value : ""
-            };
+                const datosDistLado1 = (sistema === 'distribuidor') ? codigosCableDistLado1[form.lado1_tipo.value] || {} : {};
+                const datosDistLado2 = (sistema === 'distribuidor') ? codigosCableDistLado2[form.lado2_tipo.value] || {} : {};
+                let largoCableDistTecnico = (sistema === 'distribuidor' && datosCliente.distribuidor_largo_cable_cm) ? datosCliente.distribuidor_largo_cable_cm : "";
 
-            // Buscar códigos técnicos para el cable del distribuidor
-            const datosDistLado1 = (sistema === 'distribuidor') ? codigosCableDistLado1[form.lado1_tipo.value] || {} : {};
-            const datosDistLado2 = (sistema === 'distribuidor') ? codigosCableDistLado2[form.lado2_tipo.value] || {} : {};
-            
-            // Largo técnico del cable del distribuidor (sin cálculo)
-            let largoCableDistTecnico = "";
-            if (sistema === 'distribuidor' && datosCliente.distribuidor_largo_cable_cm) {
-                largoCableDistTecnico = datosCliente.distribuidor_largo_cable_cm; // Usar el valor original
-            }
+                const datosTecnicos = {
+                    terminal_bujia: seleccionBujia.datosTecnicos.terminal || "N/A",
+                    cap_bujia: seleccionBujia.datosTecnicos.capuchon || seleccionBujia.valorCliente,
+                    terminal_bobina: terminalLadoMotor || "N/A",
+                    cap_bobina: capuchonLadoMotor || "N/A"
+                };
+                
+                articulos = largosArray.map(largo => {
+                    if (!largo) return "";
+                    const terminales = `${datosTecnicos.terminal_bujia}-${datosTecnicos.terminal_bobina}`;
+                    const capuchones = `${datosTecnicos.cap_bujia}-${datosTecnicos.cap_bobina}`;
+                    return `${codigoCable} largo ${largo} cm, ${terminales}/${capuchones}`;
+                });
 
-            const datosTecnicos = {
-                // Bujía (sin cambios)
-                terminal_bujia: seleccionBujia.datosTecnicos.terminal || "N/A",
-                cap_bujia: seleccionBujia.datosTecnicos.capuchon || seleccionBujia.valorCliente,
-                // Lado Motor (bobina o distribuidor combo - sin cambios)
-                terminal_bobina: terminalLadoMotor || "N/A",
-                cap_bobina: capuchonLadoMotor || "N/A",
-                // Datos técnicos específicos del CABLE de distribuidor
-                cable_dist_term1: datosDistLado1.terminal || "N/A",
-                cable_dist_cap1:  datosDistLado1.capuchon || "N/A",
-                cable_dist_term2: datosDistLado2.terminal || "N/A",
-                cable_dist_cap2:  datosDistLado2.capuchon || "N/A",
-                cable_dist_largo_tec: largoCableDistTecnico
-            };
-            
-            // 3. Generar la lista de artículos
-            const articulos = largosArray.map(largo => {
-                if (!largo) return "";
-                // Usamos los códigos técnicos generales (bobina/dist combo) para los cables de cilindro
-                const terminales = `${datosTecnicos.terminal_bujia}-${datosTecnicos.terminal_bobina}`;
-                const capuchones = `${datosTecnicos.cap_bujia}-${datosTecnicos.cap_bobina}`;
-                // FORMATO NUEVO CON CÓDIGO
-                return `${codigoCable} largo ${largo} cm, ${terminales}/${capuchones}`;
-            });
+                if (sistema === 'distribuidor' && datosCliente.distribuidor_largo_cable_cm) {
+                    const terminalesDist = `${datosDistLado1.terminal || "N/A"}-${datosDistLado2.terminal || "N/A"}`;
+                    const capuchonesDist = `${datosDistLado1.capuchon || "N/A"}-${datosDistLado2.capuchon || "N/A"}`;
+                    articulos.push(`${codigoCable} largo ${largoCableDistTecnico} cm, ${terminalesDist}/${capuchonesDist} (Cable Distribuidor)`);
+                    esCableDistribuidor = true; // <-- CORRECCIÓN: Le avisamos a la tabla que lo pinte de celeste
+                }
 
-            // NUEVO: Añadir el cable del distribuidor a la lista si aplica
-            let esCableDistribuidor = false; 
-            if (sistema === 'distribuidor' && datosCliente.distribuidor_largo_cable_cm) {
-                const largoDist = datosCliente.distribuidor_largo_cable_cm;
-                const terminalesDist = `${datosTecnicos.cable_dist_term1}-${datosTecnicos.cable_dist_term2}`;
-                const capuchonesDist = `${datosTecnicos.cable_dist_cap1}-${datosTecnicos.cable_dist_cap2}`;
-                // FORMATO NUEVO CON CÓDIGO
-                const descripcionCableDistribuidor = `${codigoCable} largo ${largoDist} cm, ${terminalesDist}/${capuchonesDist} (Cable Distribuidor)`;
-                articulos.push(descripcionCableDistribuidor); 
-                esCableDistribuidor = true; 
+                // Armado de Filas (Original)
+                headers = ["Cilindros", "Tipo de Cable", "Sistema", ...largosArray.map((_, i) => `Largo Cilindro ${i + 1}`)];
+                if (sistema === 'distribuidor') headers.push("Cable Dist: Lado Dist", "Cable Dist: Lado Bob", "Cable Dist: Largo (cm)");
+                headers.push("Lado Bujía", "Lado Motor", "Nota");
+
+                filaClienteData = [datosCliente.cilindros, nombreCable, datosCliente.sistema, ...largosArray];
+                if (sistema === 'distribuidor') filaClienteData.push(datosCliente.distribuidor_lado1_desc, datosCliente.distribuidor_lado2_desc, datosCliente.distribuidor_largo_cable_cm);
+                filaClienteData.push(datosCliente.cap_bujia, datosCliente.configuracion_lado_motor, datosCliente.nota);
+
+                const largosTecnicos = largosArray;
+                filaTecnicaData = [datosCliente.cilindros, codigoCable, datosCliente.sistema, ...largosTecnicos];
+                if (sistema === 'distribuidor') filaTecnicaData.push(`${datosDistLado1.capuchon}/${datosDistLado1.terminal}`, `${datosDistLado2.capuchon}/${datosDistLado2.terminal}`, largoCableDistTecnico);
+                filaTecnicaData.push(`${datosTecnicos.cap_bujia} / ${datosTecnicos.terminal_bujia}`, `${datosTecnicos.cap_bobina} / ${datosTecnicos.terminal_bobina}`);
+
+            } else {
+                // --- NUEVA LÓGICA (MODO "OTRO" / PERSONALIZADO) ---
+                const cantCablesOtro = parseInt(form.cantidad_cables_otro.value) || 0;
+                datosCliente = {
+                    cilindros: cantCablesOtro,
+                    sistema: 'otro (personalizado)',
+                    nota: form.nota.value
+                };
+
+                headers = ["Cant. Cables", "Sistema"];
+                filaClienteData = [cantCablesOtro, "Otro"];
+                filaTecnicaData = [cantCablesOtro, "Otro"];
+
+                // Recorrer los bloques generados
+                for(let i = 1; i <= cantCablesOtro; i++) {
+                    const selCable = form[`otro_tipo_cable_${i}`];
+                    const valCable = selCable.value; // Código técnico (ej: "2005.0")
+                    const textCable = selCable.options[selCable.selectedIndex].text; // Nombre visible para el cliente
+                    
+                    const largo = form[`otro_largo_${i}`].value;
+                    const valLado1 = form[`otro_lado1_${i}`].value;
+                    const valLado2 = form[`otro_lado2_${i}`].value;
+
+                    // Extraer datos técnicos de los diccionarios (Lado 1 asume base Bobina)
+                    const datosL1 = datosBobinaCombinados[valLado1] || { capuchon: "N/A", terminal: "N/A" };
+                    
+                    // Lado 2 puede ser Visual o Distribuidor
+                    let datosL2 = codigosCapuchonBujia[valLado2]; 
+                    if (!datosL2) datosL2 = datosDistribuidorCombinados[valLado2] || { capuchon: "N/A", terminal: "N/A" };
+
+                    // Generar string para la tabla de artículos
+                    const terminales = `${datosL1.terminal}-${datosL2.terminal}`;
+                    const capuchones = `${datosL1.capuchon}-${datosL2.capuchon}`;
+                    articulos.push(`${valCable} largo ${largo} cm, ${terminales}/${capuchones}`);
+
+                    // Expandir columnas del Excel para el reporte general
+                    headers.push(`Tipo Cable ${i}`, `Cable ${i} L1`, `Cable ${i} L2`, `Largo ${i}`);
+                    filaClienteData.push(textCable, form[`otro_lado1_${i}`].options[form[`otro_lado1_${i}`].selectedIndex].text, form[`otro_lado2_${i}`].options[form[`otro_lado2_${i}`].selectedIndex].text, largo);
+                    filaTecnicaData.push(valCable, `${datosL1.capuchon}/${datosL1.terminal}`, `${datosL2.capuchon}/${datosL2.terminal}`, largo);
+                }
+
+                headers.push("Nota");
+                filaClienteData.push(datosCliente.nota);
+                // filaTecnicaData no lleva nota
             }
 
             // 4. Crear y llenar el archivo Excel
@@ -618,67 +772,9 @@
             sheet.addRow([]); 
             // --- FIN: Agregar Fila de Título Principal ---
             
-            // Fila de Encabezados (AJUSTADA PARA COMBINAR)
-            const headers = ["Cilindros", "Tipo de Cable", "Sistema", ...largosArray.map((_, i) => `Largo Cilindro ${i + 1}`)];
-            
-            if (sistema === 'distribuidor') {
-                // Encabezados para el CABLE del distribuidor (mostrando datos del cliente)
-                headers.push(
-                    "Cable Distribuidor: Lado Distribuidor", // Descripción Lado 1 (Cliente)
-                    "Cable Distribuidor: Lado Bobina",      // Descripción Lado 2 (Cliente)
-                    "Cable Distribuidor: Largo (cm)"        // Largo CM (Cliente)
-                );
-            }
-            
-            // Encabezados generales (para Cliente Y Técnico)
-            headers.push(
-                "Lado Bujía",             // Combinará descripción (Cliente) o códigos Cap/Term (Técnico)
-                "Lado Motor",             // Combinará descripción (Cliente) o códigos Cap/Term (Técnico)
-                "Nota"                    // Nota (Solo Cliente)
-            );
+            // --- INSERCIÓN DINÁMICA DE FILAS ---
             sheet.addRow(headers);
-
-            // Fila Cliente
-            const filaClienteData = [datosCliente.cilindros, nombreCable, datosCliente.sistema, ...largosArray];
-            if (sistema === 'distribuidor') {
-                filaClienteData.push(
-                datosCliente.distribuidor_lado1_desc,
-                datosCliente.distribuidor_lado2_desc,
-                datosCliente.distribuidor_largo_cable_cm
-                );
-            }
-            filaClienteData.push(datosCliente.cap_bujia, datosCliente.configuracion_lado_motor, datosCliente.nota);
             sheet.addRow(filaClienteData).eachCell(cell => cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' });
-
-            // Fila Técnica (COMBINANDO CÓDIGOS)
-            const largosTecnicos = largosArray; // Largos originales
-            const filaTecnicaData = [datosCliente.cilindros, codigoCable, datosCliente.sistema, ...largosTecnicos];
-
-            // Combinar códigos técnicos en strings
-            const ladoBujiaTec = `${datosTecnicos.cap_bujia} / ${datosTecnicos.terminal_bujia}`;
-            const ladoMotorTec = `${datosTecnicos.cap_bobina} / ${datosTecnicos.terminal_bobina}`;
-
-            // Añadir datos TÉCNICOS específicos según el sistema elegido
-            if (sistema === 'distribuidor') {
-                // Si es DISTRIBUIDOR, añadimos los datos combinados del CABLE
-                const cableLado1Tec = `${datosTecnicos.cable_dist_cap1} / ${datosTecnicos.cable_dist_term1}`;
-                const cableLado2Tec = `${datosTecnicos.cable_dist_cap2} / ${datosTecnicos.cable_dist_term2}`;
-                
-                filaTecnicaData.push(
-                    cableLado1Tec,                      // Lado 1 del Cable (Cap/Term)
-                    cableLado2Tec,                      // Lado 2 del Cable (Cap/Term)
-                    datosTecnicos.cable_dist_largo_tec  // Largo técnico del Cable
-                );
-            }
-            
-            // Añadir SIEMPRE los datos técnicos COMBINADOS generales
-            filaTecnicaData.push(
-                ladoBujiaTec,   // Lado Bujía (Cap/Term)
-                ladoMotorTec    // Lado Motor (Cap/Term)
-                // La nota no se agrega a la fila técnica
-            );
-
-            // Aplicar estilo a la Fila Técnica
             sheet.addRow(filaTecnicaData).eachCell(cell => {
                 cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFA500' } };
                 cell.alignment = { wrapText: true, vertical: 'middle', horizontal: 'center' };
