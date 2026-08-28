@@ -159,6 +159,7 @@
                         <label class="cards "><img src="./images/1x/CF22_RECTO.png" alt="RECTO"><span>Recto</span><input type="radio" name="cap_bujia_categoria" value="recto" data-single-model="true" data-model-value="CF22" required></label>
                         <label class="cards "><img src="./images/1x/CF19_90.png" alt="A 90"><span>A 90°</span><input type="radio" name="cap_bujia_categoria" value="90" required></label>
                         <label class="cards "><img src="./images/1x/CF39_ANGULO.png" alt="EN ANGULO"><span>En ángulo</span><input type="radio" name="cap_bujia_categoria" value="angulo" required></label>
+                        <label class="cards "><img src="./images/1x/CF_incognito.png" alt="OTRO"><span>Otro (escribir)</span><input type="radio" name="cap_bujia_categoria" value="otro" required></label>
                     </div>
 
                     <div id="submenus-capuchones" class="submenu-container">
@@ -190,6 +191,13 @@
                                 <label class="cards model-card"><img src="./images/1x/CF15_ANGULO.png" alt="Angulo 45 CF15"><span>CF15</span><input type="radio" name="cap_bujia_modelo_final" value="CF15"></label>
                                 <label class="cards model-card"><img src="./images/1x/CF39_ANGULO.png" alt="Angulo 45 CF39"><span>CF39</span><input type="radio" name="cap_bujia_modelo_final" value="CF39"></label>
                             </div>
+                        </div>
+                        <div id="submenu-otro" class="submenu-capuchon hidden">
+                            <label>Paso 2: Escriba el capuchón y el terminal</label>
+                            <label for="cap_bujia_otro_capuchon" style="font-weight:normal;">Capuchón <span class="required">*</span></label>
+                            <input type="text" id="cap_bujia_otro_capuchon" name="cap_bujia_otro_capuchon" placeholder="Ej: CF100 o descripción del capuchón">
+                            <label for="cap_bujia_otro_terminal" style="font-weight:normal;">Terminal (opcional, pero se recomienda completarlo)</label>
+                            <input type="text" id="cap_bujia_otro_terminal" name="cap_bujia_otro_terminal" placeholder="Ej: T35">
                         </div>
                     </div>
                 </div>
@@ -311,6 +319,10 @@
                 document.querySelectorAll('input[name="cap_bujia_categoria"]').forEach(r => r.required = !esOtro);
                 if (esOtro) {
                     document.querySelectorAll('input[name="cap_bujia_modelo_final"]').forEach(r => r.required = false);
+                    // La sección de bujía queda oculta: apagar el required del capuchón escrito
+                    inputOtroCapuchon.required = false;
+                    inputOtroCapuchon.value = '';
+                    inputOtroTerminal.value = '';
                 }
 
                 if (radio.value === "bobinas" && radio.checked) {
@@ -381,9 +393,37 @@
                         <optgroup label="Lado Disttribuidor">
                             ${cleanLadoDistribuidor}
                         </optgroup>
+                        <optgroup label="Personalizado">
+                            <option value="__otro__">Otro (escribir capuchón y terminal)</option>
+                        </optgroup>
                     </select>
+
+                    <div id="otro_lado2_custom_${i}" class="hidden" style="margin-top:10px;padding:12px;border:1px dashed #FE5000;border-radius:6px;background:#fff8f5;">
+                        <label style="font-weight:normal;margin-top:0;">Capuchón Lado 2 <span class="required">*</span></label>
+                        <input type="text" name="otro_lado2_cap_${i}" placeholder="Ej: CF100 o descripción del capuchón">
+                        <label style="font-weight:normal;">Terminal Lado 2 (opcional, pero se recomienda completarlo)</label>
+                        <input type="text" name="otro_lado2_term_${i}" placeholder="Ej: T35">
+                    </div>
                 `;
                 contenedorCablesOtro.appendChild(bloqueCable);
+            }
+        });
+
+        // Mostrar/ocultar los campos de "Otro" del Lado 2 (delegado: los bloques se regeneran)
+        contenedorCablesOtro.addEventListener('change', (e) => {
+            const match = /^otro_lado2_(\d+)$/.exec(e.target.name || '');
+            if (!match) return;
+            const i = match[1];
+            const bloqueCustom = document.getElementById(`otro_lado2_custom_${i}`);
+            const inputCap = bloqueCustom.querySelector(`input[name="otro_lado2_cap_${i}"]`);
+            const inputTerm = bloqueCustom.querySelector(`input[name="otro_lado2_term_${i}"]`);
+            const esOtroLado2 = (e.target.value === '__otro__');
+
+            bloqueCustom.classList.toggle('hidden', !esOtroLado2);
+            inputCap.required = esOtroLado2; // el capuchón es obligatorio, el terminal no
+            if (!esOtroLado2) {
+                inputCap.value = '';
+                inputTerm.value = '';
             }
         });
 
@@ -419,6 +459,8 @@
     const cardsModeloVisual = document.querySelectorAll('.model-card');
     const radiosModeloFinal = document.querySelectorAll('input[name="cap_bujia_modelo_final"]');
     const form = document.getElementById('formCables'); // Referencia al formulario
+    const inputOtroCapuchon = document.getElementById('cap_bujia_otro_capuchon');
+    const inputOtroTerminal = document.getElementById('cap_bujia_otro_terminal');
 
     // Lógica para elegir el MÉTODO
     /*
@@ -460,6 +502,12 @@
                 r.checked = false;
             });
             cardsModeloVisual.forEach(c => c.classList.remove('selected-card'));
+            // Siempre: apagar el required de "Otro" (se vuelve a encender más abajo si corresponde)
+            inputOtroCapuchon.required = false;
+            if (categoriaValue !== 'otro') {
+                inputOtroCapuchon.value = '';
+                inputOtroTerminal.value = '';
+            }
 
             if (esModeloUnico) {
                 // --- CASO MODELO ÚNICO ---
@@ -499,6 +547,10 @@
                     submenuAMostrar.classList.remove('hidden');
                     // Hacer obligatorios solo los modelos DENTRO del submenú visible
                     submenuAMostrar.querySelectorAll('input[name="cap_bujia_modelo_final"]').forEach(r => r.required = true);
+                    // Si es "Otro", el capuchón escrito es obligatorio (el terminal no)
+                    if (categoriaValue === 'otro') {
+                        inputOtroCapuchon.required = true;
+                    }
                 }
             }
         });
@@ -619,6 +671,15 @@
                 }
                 return { datosTecnicos: {}, valorCliente: "" };
             };*/
+                const categoriaSeleccionada = form.querySelector('input[name="cap_bujia_categoria"]:checked');
+                if (categoriaSeleccionada && categoriaSeleccionada.value === 'otro') {
+                    const capOtro = form.cap_bujia_otro_capuchon.value.trim().toUpperCase();
+                    const termOtro = form.cap_bujia_otro_terminal.value.trim().toUpperCase();
+                    return {
+                        datosTecnicos: { capuchon: capOtro, terminal: termOtro },
+                        valorCliente: termOtro ? `Otro: ${capOtro} / ${termOtro}` : `Otro: ${capOtro}`
+                    };
+                }
                 const modeloVisual = form.querySelector('input[name="cap_bujia_modelo_final"]:checked');
                 if (modeloVisual) {
                     const nombreModelo = modeloVisual.value;
@@ -736,9 +797,20 @@
                     // Extraer datos técnicos de los diccionarios (Lado 1 asume base Bobina)
                     const datosL1 = datosBobinaCombinados[valLado1] || { capuchon: "N/A", terminal: "N/A" };
                     
-                    // Lado 2 puede ser Visual o Distribuidor
-                    let datosL2 = codigosCapuchonBujia[valLado2]; 
-                    if (!datosL2) datosL2 = datosDistribuidorCombinados[valLado2] || { capuchon: "N/A", terminal: "N/A" };
+                    // Lado 2 puede ser Visual, Distribuidor o escrito a mano ("Otro")
+                    const selLado2 = form[`otro_lado2_${i}`];
+                    let datosL2;
+                    let textLado2 = selLado2.options[selLado2.selectedIndex].text;
+
+                    if (valLado2 === '__otro__') {
+                        const capL2 = form[`otro_lado2_cap_${i}`].value.trim().toUpperCase();
+                        const termL2 = form[`otro_lado2_term_${i}`].value.trim().toUpperCase();
+                        datosL2 = { capuchon: capL2, terminal: termL2 || "N/A" };
+                        textLado2 = termL2 ? `Otro: ${capL2} / ${termL2}` : `Otro: ${capL2}`;
+                    } else {
+                        datosL2 = codigosCapuchonBujia[valLado2];
+                        if (!datosL2) datosL2 = datosDistribuidorCombinados[valLado2] || { capuchon: "N/A", terminal: "N/A" };
+                    }
 
                     // Generar string para la tabla de artículos
                     const terminales = `${datosL1.terminal}-${datosL2.terminal}`;
@@ -747,7 +819,7 @@
 
                     // Expandir columnas del Excel para el reporte general
                     headers.push(`Tipo Cable ${i}`, `Cable ${i} L1`, `Cable ${i} L2`, `Largo ${i}`);
-                    filaClienteData.push(textCable, form[`otro_lado1_${i}`].options[form[`otro_lado1_${i}`].selectedIndex].text, form[`otro_lado2_${i}`].options[form[`otro_lado2_${i}`].selectedIndex].text, largo);
+                    filaClienteData.push(textCable, form[`otro_lado1_${i}`].options[form[`otro_lado1_${i}`].selectedIndex].text, textLado2, largo);
                     filaTecnicaData.push(valCable, `${datosL1.capuchon}/${datosL1.terminal}`, `${datosL2.capuchon}/${datosL2.terminal}`, largo);
                 }
 
