@@ -647,6 +647,32 @@
         //////////////////////////////////////////
 
 
+        // --- EQUIVALENCIAS CON ODOO ---
+        // Verificado contra ferrazzi-master el 2026-08-28. Ojo: NO es una fórmula.
+        // La mayoría de los capuchones son de la familia Competición (INSCAP10xx),
+        // pero CF17 y CF62 sólo existen en la familia común (INSCAP00xx).
+        const odooCapuchones = {
+            "CF05": "INSCAP1005", "CF15": "INSCAP1015", "CF16": "INSCAP1016",
+            "CF17": "INSCAP0017", "CF18": "INSCAP1018", "CF19": "INSCAP1019",
+            "CF20": "INSCAP1020", "CF22": "INSCAP1022", "CF23": "INSCAP1023",
+            "CF24": "INSCAP1024", "CF27": "INSCAP1027", "CF39": "INSCAP1039",
+            "CF57": "INSCAP1057", "CF62": "INSCAP0062", "CF74": "INSCAP1074",
+            "CF77": "INSCAP1077", "CF144": "INSCAP1144", "CF216": "INSCAP1216",
+            "CF230": "INSCAP1230"
+        };
+        // El formulario escribe los terminales sin criterio fijo (T9, T05, T5).
+        // Se contemplan las dos formas para que ninguna quede sin mapear.
+        const odooTerminales = {
+            "T5": "INSTER0005", "T05": "INSTER0005", "T6": "INSTER0006", "T06": "INSTER0006",
+            "T7": "INSTER0007", "T07": "INSTER0007", "T9": "INSTER0009", "T09": "INSTER0009",
+            "T10": "INSTER0010", "T15": "INSTER0015", "T22": "INSTER0022", "T35": "INSTER0035",
+            "T77": "INSTER0077", "T92": "INSTER0092", "T96": "INSTER0096", "T216": "INSTER0216"
+        };
+        // Sobrante de pelado y engarce por cable. Sale de las LdM que ya existen en Odoo.
+        const SOBRANTE_CM = 3.5;
+        const UOM_UNIDAD = "uom.product_uom_unit";
+        const UOM_METRO = "uom.product_uom_meter";
+
         // --- LÓGICA DE EXPORTACIÓN AL ENVIAR EL FORMULARIO ---
         document.getElementById("formCables").addEventListener("submit", async function(e){
             e.preventDefault();
@@ -696,6 +722,37 @@
             let filaClienteData = [];
             let filaTecnicaData = [];
             let esCableDistribuidor = false;
+
+            // --- ACUMULADOR PARA LA HOJA DE IMPORTACIÓN ---
+            // Se suma por código de producto: dos cables que usen el mismo capuchón
+            // tienen que salir como una sola línea con cantidad 2, no como dos líneas.
+            const componentesOdoo = new Map();
+            const siliconaPorCable = new Map(); // un pedido puede mezclar tipos de silicona
+
+            const sumarComponenteOdoo = (codigo, cantidad, uomId, mapeado) => {
+                if (!codigo || codigo === "N/A") return;
+                const clave = `${codigo}||${uomId}`;
+                const item = componentesOdoo.get(clave);
+                if (item) { item.cantidad += cantidad; return; }
+                componentesOdoo.set(clave, { codigo, cantidad, uomId, mapeado });
+            };
+            const sumarCapuchonOdoo = (codForm) => {
+                if (!codForm || codForm === "N/A") return;
+                const codOdoo = odooCapuchones[codForm];
+                // Sin equivalencia = lo escribieron a mano. Sale igual, pintado en amarillo.
+                sumarComponenteOdoo(codOdoo || codForm, 1, UOM_UNIDAD, !!codOdoo);
+            };
+            const sumarTerminalOdoo = (codForm) => {
+                if (!codForm || codForm === "N/A") return;
+                const codOdoo = odooTerminales[codForm];
+                sumarComponenteOdoo(codOdoo || codForm, 1, UOM_UNIDAD, !!codOdoo);
+            };
+            const sumarSiliconaOdoo = (codigoCable, largoCm) => {
+                const largo = parseFloat(largoCm);
+                if (!codigoCable || !largo) return;
+                const acumulado = siliconaPorCable.get(codigoCable) || 0;
+                siliconaPorCable.set(codigoCable, acumulado + largo + SOBRANTE_CM);
+            };
 
             if (!esModoOtro) {
                 // --- LÓGICA ORIGINAL (BOBINA / DISTRIBUIDOR) ---
@@ -755,6 +812,24 @@
                     const capuchonesDist = `${datosDistLado1.capuchon || "N/A"}-${datosDistLado2.capuchon || "N/A"}`;
                     articulos.push(`${codigoCable} largo ${largoCableDistTecnico} cm, ${terminalesDist}/${capuchonesDist} (Cable Distribuidor)`);
                     esCableDistribuidor = true; // <-- CORRECCIÓN: Le avisamos a la tabla que lo pinte de celeste
+                }
+
+                // Alimentar la hoja de importación: un juego de N cilindros lleva
+                // N capuchones y N terminales de cada tipo, más la silicona sumada.
+                largosArray.forEach(largo => {
+                    if (!largo) return;
+                    sumarCapuchonOdoo(datosTecnicos.cap_bujia);
+                    sumarTerminalOdoo(datosTecnicos.terminal_bujia);
+                    sumarCapuchonOdoo(datosTecnicos.cap_bobina);
+                    sumarTerminalOdoo(datosTecnicos.terminal_bobina);
+                    sumarSiliconaOdoo(codigoCable, largo);
+                });
+                if (esCableDistribuidor) {
+                    sumarCapuchonOdoo(datosDistLado1.capuchon);
+                    sumarTerminalOdoo(datosDistLado1.terminal);
+                    sumarCapuchonOdoo(datosDistLado2.capuchon);
+                    sumarTerminalOdoo(datosDistLado2.terminal);
+                    sumarSiliconaOdoo(codigoCable, largoCableDistTecnico);
                 }
 
                 // Armado de Filas (Original)
@@ -817,6 +892,13 @@
                     const capuchones = `${datosL1.capuchon}-${datosL2.capuchon}`;
                     articulos.push(`${valCable} largo ${largo} cm, ${terminales}/${capuchones}`);
 
+                    // Acá cada cable puede llevar capuchones y hasta silicona distinta
+                    sumarCapuchonOdoo(datosL1.capuchon);
+                    sumarTerminalOdoo(datosL1.terminal);
+                    sumarCapuchonOdoo(datosL2.capuchon);
+                    sumarTerminalOdoo(datosL2.terminal);
+                    sumarSiliconaOdoo(valCable, largo);
+
                     // Expandir columnas del Excel para el reporte general
                     headers.push(`Tipo Cable ${i}`, `Cable ${i} L1`, `Cable ${i} L2`, `Largo ${i}`);
                     filaClienteData.push(textCable, form[`otro_lado1_${i}`].options[form[`otro_lado1_${i}`].selectedIndex].text, textLado2, largo);
@@ -830,7 +912,9 @@
 
             // 4. Crear y llenar el archivo Excel
             const workbook = new ExcelJS.Workbook();
-            const sheet = workbook.addWorksheet("Pedido");
+            const hojaOdoo = workbook.addWorksheet("Importar Odoo");          // 1ra: lista para importar
+            const sheet = workbook.addWorksheet("Pedido");                    // 2da: la de siempre
+            const hojaInstrucciones = workbook.addWorksheet("Instrucciones"); // 3ra: cómo importarla
             // --- INICIO: Agregar Fila de Título Principal ---
             const titleRow = sheet.addRow(['Cables Especiales']);
             // Fusiona celdas (ajusta la 'G' si tienes más o menos columnas fijas antes de los largos)
@@ -918,6 +1002,72 @@
             // Ajuste especial para la columna de Artículos (D) si existe
             const colArticulo = sheet.getColumn('D');
             if (colArticulo) colArticulo.width = 40; // Dale un ancho fijo más grande
+            // --- HOJA 1: formato de importación de Odoo ---
+            const AMARILLO = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
+
+            const filasOdoo = [];
+            componentesOdoo.forEach(item => filasOdoo.push(item));
+            siliconaPorCable.forEach((cm, codigo) => {
+                // 3 decimales, igual que las LdM que ya están cargadas (ej: 2.325)
+                filasOdoo.push({ codigo, cantidad: Math.round(cm * 10) / 1000, uomId: UOM_METRO, mapeado: true });
+            });
+
+            hojaOdoo.addRow([
+                "id", "product_tmpl_id", "code",
+                "bom_line_ids/product_id", "bom_line_ids/product_qty", "bom_line_ids/product_uom_id/id"
+            ]).eachCell(cell => { cell.font = { bold: true }; });
+
+            filasOdoo.forEach((item, idx) => {
+                const fila = hojaOdoo.addRow(["", "", "", item.codigo, item.cantidad, item.uomId]);
+                if (idx === 0) {
+                    // Odoo exige el producto destino: si va vacío, la importación ni arranca.
+                    const celdaProducto = fila.getCell(2);
+                    celdaProducto.value = "COMPLETAR: producto Cable especial";
+                    celdaProducto.fill = AMARILLO;
+                    celdaProducto.font = { bold: true };
+                }
+                if (!item.mapeado) {
+                    const celdaComponente = fila.getCell(4);
+                    celdaComponente.fill = AMARILLO;
+                    celdaComponente.note = 'Escrito a mano en el formulario: no tiene código de Odoo. Corregilo o borrá la fila antes de importar.';
+                }
+            });
+            [12, 34, 18, 26, 16, 30].forEach((ancho, i) => { hojaOdoo.getColumn(i + 1).width = ancho; });
+
+            // --- HOJA 3: instrucciones ---
+            const tituloInstrucciones = hojaInstrucciones.addRow(["Cómo importar esta lista de materiales en Odoo"]);
+            tituloInstrucciones.font = { size: 14, bold: true };
+            hojaInstrucciones.addRow([]);
+            [
+                ["1", "Odoo → Fabricación → Productos → Listas de materiales."],
+                ["2", "Menú engranaje → Importar registros → Subir archivo, y elegí este mismo archivo."],
+                ["3", "Cuando pregunte qué hoja usar, elegí 'Importar Odoo'. Las otras dos son de referencia y no se importan."],
+                ["4", "En la columna product_tmpl_id, primera fila, reemplazá la celda amarilla por el producto destino (los que empiezan con 'Cable especial'). Va sólo en la PRIMERA fila: las de abajo quedan vacías a propósito, así Odoo entiende que son líneas de la misma lista."],
+                ["5", "Si alguna celda de bom_line_ids/product_id está en amarillo, es un capuchón o terminal que se escribió a mano en el formulario y no tiene código en Odoo. Corregilo por el código real o borrá esa fila."],
+                ["6", "Las columnas id y code van vacías a propósito: Odoo genera el identificador solo y la referencia es opcional."],
+                ["7", "Usá 'Testear importación' antes de confirmar. Si algo no coincide, Odoo lo marca sin crear nada."]
+            ].forEach(fila => hojaInstrucciones.addRow(fila));
+
+            hojaInstrucciones.addRow([]);
+            const tituloCalculo = hojaInstrucciones.addRow(["Cómo se calculó el cable de silicona"]);
+            tituloCalculo.font = { size: 12, bold: true };
+            [
+                ["", "metros = suma de (largo de cada cable + 3,5 cm) / 100"],
+                ["", "Los 3,5 cm son el sobrante de pelado y engarce. Sale de las listas de materiales que ya están cargadas en Odoo."],
+                ["", "El cable del distribuidor, cuando corresponde, está incluido en ese total. Conviene que producción lo confirme."]
+            ].forEach(fila => hojaInstrucciones.addRow(fila));
+
+            hojaInstrucciones.addRow([]);
+            const tituloExcluido = hojaInstrucciones.addRow(["Qué no incluye esta lista"]);
+            tituloExcluido.font = { size: 12, bold: true };
+            hojaInstrucciones.addRow(["", "No se agregan envase, caja ni kit de accesorios. Si el circuito los necesita, se cargan a mano en Odoo después de importar."]);
+
+            hojaInstrucciones.getColumn(1).width = 6;
+            hojaInstrucciones.getColumn(2).width = 110;
+            hojaInstrucciones.eachRow(fila => {
+                fila.getCell(2).alignment = { wrapText: true, vertical: 'top' };
+            });
+
             const buf = await workbook.xlsx.writeBuffer();
             const blob = new Blob([buf], { type: "application/octet-stream" });
             const a = document.createElement("a");
