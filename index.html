@@ -668,6 +668,18 @@
             "T10": "INSTER0010", "T15": "INSTER0015", "T22": "INSTER0022", "T35": "INSTER0035",
             "T77": "INSTER0077", "T92": "INSTER0092", "T96": "INSTER0096", "T216": "INSTER0216"
         };
+        // Productos destino posibles para la LdM. Nombres exactos de Odoo (product.template).
+        // Se usan para el desplegable de la celda amarilla: el formulario no pregunta la
+        // linea de producto, asi que la elige quien prepara el archivo antes de importar.
+        const odooProductosDestino = [
+            "Cable especial BASIC",
+            "Cable especial COMPETICION (copia)",
+            "Cable especial EXTREME",
+            "Cable especial SUPERIOR COBRE",
+            "Cable especial SUPERIOR POWGEN 01",
+            "Cable especial SUPERIOR POWGEN 02",
+            "Cable especial para formulario"
+        ];
         // Sobrante de pelado y engarce por cable. Sale de las LdM que ya existen en Odoo.
         const SOBRANTE_CM = 3.5;
         const UOM_UNIDAD = "uom.product_uom_unit";
@@ -1020,11 +1032,20 @@
             filasOdoo.forEach((item, idx) => {
                 const fila = hojaOdoo.addRow(["", "", "", item.codigo, item.cantidad, item.uomId]);
                 if (idx === 0) {
-                    // Odoo exige el producto destino: si va vacío, la importación ni arranca.
+                    // Odoo exige el producto destino y su pantalla de importación no deja
+                    // editar valores, sólo mapear columnas: esto se completa acá, en el Excel.
                     const celdaProducto = fila.getCell(2);
-                    celdaProducto.value = "COMPLETAR: producto Cable especial";
+                    celdaProducto.value = "COMPLETAR ACA ANTES DE IMPORTAR";
                     celdaProducto.fill = AMARILLO;
                     celdaProducto.font = { bold: true };
+                    celdaProducto.dataValidation = {
+                        type: 'list',
+                        allowBlank: false,
+                        formulae: [`"${odooProductosDestino.join(',')}"`],
+                        showErrorMessage: false, // no bloquear si maniana agregan un producto nuevo
+                        promptTitle: 'Producto destino',
+                        prompt: 'Eleg\u00ed el producto Cable especial al que se le va a cargar esta lista de materiales.'
+                    };
                 }
                 if (!item.mapeado) {
                     const celdaComponente = fila.getCell(4);
@@ -1039,14 +1060,20 @@
             tituloInstrucciones.font = { size: 14, bold: true };
             hojaInstrucciones.addRow([]);
             [
-                ["1", "Odoo → Fabricación → Productos → Listas de materiales."],
-                ["2", "Menú engranaje → Importar registros → Subir archivo, y elegí este mismo archivo."],
-                ["3", "Odoo toma la PRIMERA hoja del archivo, que es justamente 'Importar Odoo'. Si te ofreciera elegir la hoja, elegí esa. Las otras dos son de referencia y no se importan."],
-                ["4", "En la columna product_tmpl_id, primera fila, reemplazá la celda amarilla por el producto destino (los que empiezan con 'Cable especial'). Va sólo en la PRIMERA fila: las de abajo quedan vacías a propósito, así Odoo entiende que son líneas de la misma lista."],
-                ["5", "Si alguna celda de bom_line_ids/product_id está en amarillo, es un capuchón o terminal que se escribió a mano en el formulario y no tiene código en Odoo. Corregilo por el código real o borrá esa fila."],
-                ["6", "Las columnas id y code van vacías a propósito: Odoo genera el identificador solo y la referencia es opcional."],
-                ["7", "Usá 'Testear importación' antes de confirmar. Si algo no coincide, Odoo lo marca sin crear nada."]
+                ["1", "PRIMERO, EN EXCEL. La pantalla de importación de Odoo sólo deja mapear columnas, no editar valores. Así que abrí este archivo, andá a la hoja 'Importar Odoo' y completá la celda amarilla de product_tmpl_id (columna B, fila 2). Tiene un desplegable con los productos 'Cable especial'. Después guardá el archivo."],
+                ["2", "El producto va SÓLO en esa primera fila de datos. Las de abajo quedan vacías a propósito: así Odoo entiende que son líneas de la misma lista de materiales."],
+                ["3", "Si alguna celda de bom_line_ids/product_id está en amarillo, es un capuchón o terminal que se escribió a mano en el formulario y no tiene código en Odoo. Corregilo por el código real o borrá esa fila. También antes de subir."],
+                ["4", "Ya con el archivo guardado: Odoo → Fabricación → Productos → Listas de materiales, y pasá a vista de lista."],
+                ["5", "Menú engranaje → Importar registros → Subir archivo, y elegí este archivo."],
+                ["6", "Odoo toma la PRIMERA hoja del archivo, que es justamente 'Importar Odoo'. Si te ofreciera elegir la hoja, elegí esa. Las otras dos son de referencia y no se importan."],
+                ["7", "Las columnas id y code van vacías a propósito: Odoo genera el identificador solo y la referencia es opcional."],
+                ["8", "Usá 'Testear importación' antes de confirmar. Si algo no coincide, Odoo lo marca sin crear nada."]
             ].forEach(fila => hojaInstrucciones.addRow(fila));
+
+            hojaInstrucciones.addRow([]);
+            const tituloDestinos = hojaInstrucciones.addRow(["Productos destino disponibles"]);
+            tituloDestinos.font = { size: 12, bold: true };
+            odooProductosDestino.forEach(nombre => hojaInstrucciones.addRow(["", nombre]));
 
             hojaInstrucciones.addRow([]);
             const tituloCalculo = hojaInstrucciones.addRow(["Cómo se calculó el cable de silicona"]);
