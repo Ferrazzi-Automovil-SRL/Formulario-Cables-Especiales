@@ -1025,12 +1025,15 @@
             });
 
             hojaOdoo.addRow([
-                "id", "product_tmpl_id", "code",
+                "id", "product_tmpl_id", "code", "sequence",
                 "bom_line_ids/product_id", "bom_line_ids/product_qty", "bom_line_ids/product_uom_id/id"
             ]).eachCell(cell => { cell.font = { bold: true }; });
 
             filasOdoo.forEach((item, idx) => {
-                const fila = hojaOdoo.addRow(["", "", "", item.codigo, item.cantidad, item.uomId]);
+                // sequence -1 sólo en la primera fila (es un campo de la LdM, no de la línea).
+                // Las LdM ya cargadas tienen sequence 0, así que con -1 la importada queda
+                // arriba y es la que Odoo propone al lanzar una orden de fabricación.
+                const fila = hojaOdoo.addRow(["", "", "", idx === 0 ? -1 : "", item.codigo, item.cantidad, item.uomId]);
                 if (idx === 0) {
                     // Odoo exige el producto destino y su pantalla de importación no deja
                     // editar valores, sólo mapear columnas: esto se completa acá, en el Excel.
@@ -1048,12 +1051,12 @@
                     };
                 }
                 if (!item.mapeado) {
-                    const celdaComponente = fila.getCell(4);
+                    const celdaComponente = fila.getCell(5);
                     celdaComponente.fill = AMARILLO;
                     celdaComponente.note = 'Escrito a mano en el formulario: no tiene código de Odoo. Corregilo o borrá la fila antes de importar.';
                 }
             });
-            [12, 34, 18, 26, 16, 30].forEach((ancho, i) => { hojaOdoo.getColumn(i + 1).width = ancho; });
+            [12, 34, 18, 11, 26, 16, 30].forEach((ancho, i) => { hojaOdoo.getColumn(i + 1).width = ancho; });
 
             // --- HOJA 3: instrucciones ---
             const tituloInstrucciones = hojaInstrucciones.addRow(["Cómo importar esta lista de materiales en Odoo"]);
@@ -1067,7 +1070,8 @@
                 ["5", "Menú engranaje → Importar registros → Subir archivo, y elegí este archivo."],
                 ["6", "Odoo toma la PRIMERA hoja del archivo, que es justamente 'Importar Odoo'. Si te ofreciera elegir la hoja, elegí esa. Las otras dos son de referencia y no se importan."],
                 ["7", "Las columnas id y code van vacías a propósito: Odoo genera el identificador solo y la referencia es opcional."],
-                ["8", "Usá 'Testear importación' antes de confirmar. Si algo no coincide, Odoo lo marca sin crear nada."]
+                ["8", "La columna sequence viene con -1 en la primera fila. Las listas que ya existen en el mismo producto tienen 0, así que la importada queda primera y es la que Odoo propone al lanzar la fabricación."],
+                ["9", "Usá 'Testear importación' antes de confirmar. Si algo no coincide, Odoo lo marca sin crear nada."]
             ].forEach(fila => hojaInstrucciones.addRow(fila));
 
             hojaInstrucciones.addRow([]);
